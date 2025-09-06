@@ -1,76 +1,102 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ShotCaller Premium Access For 2 matches</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ShotCaller Toss Exchange</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f7f9fc;
-      color: #222;
-      max-width: 500px;
-      margin: 30px auto;
+      background: #0b1a2e;
+      color: #fff;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background: #1f2e45;
       padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.05);
       text-align: center;
+      font-size: 28px;
+      font-weight: bold;
+      border-bottom: 3px solid #ffa500;
     }
-    h1 {
-      color: #1e90ff;
-      margin-bottom: 10px;
+    .container {
+      padding: 20px;
     }
-    .btn {
-      display: inline-block;
-      margin: 20px 0;
-      padding: 14px 28px;
-      background: #1e90ff;
-      color: white;
+    .match {
+      background: #162b40;
+      border: 1px solid #ffa500;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+    }
+    .match h2 {
+      margin: 0 0 10px;
+      color: #ffa500;
+    }
+    .team {
       font-size: 18px;
-      font-weight: bold;
-      text-decoration: none;
-      border-radius: 6px;
+      margin: 5px 0;
     }
-    .info {
-      margin-top: 20px;
+    .odds {
+      margin-top: 10px;
+    }
+    .odds button {
+      margin: 5px;
+      padding: 10px 15px;
       font-size: 16px;
-      color: #333;
+      background: #ffa500;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      color: #000;
     }
-    .telegram-link {
-      color: #0088cc;
-      text-decoration: none;
-      font-weight: bold;
+    .odds button:hover {
+      background: #ffcc66;
     }
     footer {
-      margin-top: 40px;
+      text-align: center;
+      padding: 15px;
+      background: #1f2e45;
+      color: #aaa;
       font-size: 14px;
-      color: #999;
     }
   </style>
 </head>
 <body>
+  <header>
+    ShotCaller Toss Exchange
+  </header>
 
-  <h1>ShotCaller Premium Access For 2 matches  </h1>
-  <p><strong>Match:</strong> AR Vs AKS AND ENGLAND Vs AFRICA  </p>
-     <strong>Time:</strong> 2:30 PM AND 5:00 AM Today</p>
+  <div class="container">
 
-  <p>Pay ₹99 using UPI to:</p>
-  <p><strong>millionairebhalla@fam</strong></p>
+    <!-- Match 1 -->
+    <div class="match">
+      <h2>India vs Pakistan (Live)</h2>
+      <div class="team">Toss Winner: <strong>India</strong></div>
+      <div class="team">Match Status: <em>1st Innings - 10.2 overs</em></div>
+      <div class="odds">
+        <p><strong>Place Your Toss Bets:</strong></p>
+        <button>India - 1.75</button>
+        <button>Pakistan - 2.10</button>
+      </div>
+    </div>
 
-  <!-- UPI link (works best on mobile) -->
-  <a href="upi://pay?pa=millionairebhalla@fam&pn=ShotCaller&am=99&cu=INR" class="btn">
-    Pay ₹99 via UPI
-  </a>
-  
-  <div class="info">
-    <p>After completing the payment, send your payment screensot to me on Telegram:</p>
-    <p><a href="https://t.me/ShotCallOffixial" class="telegram-link">@ShotCallOffixial</a></p>
-    <p>After verification, you’ll receive access to the premium ShotCaller Telegram channel.</p>
+    <!-- Match 2 -->
+    <div class="match">
+      <h2>Australia vs England (Upcoming)</h2>
+      <div class="team">Match Time: <strong>6:30 PM IST</strong></div>
+      <div class="odds">
+        <p><strong>Who Will Win the Toss?</strong></p>
+        <button>Australia - 1.90</button>
+        <button>England - 1.95</button>
+      </div>
+    </div>
+
   </div>
 
   <footer>
-    &copy; 2025 ShotCaller. All rights reserved.
+    &copy; 2025 ShotCaller Toss Exchange. All rights reserved.
   </footer>
-
 </body>
 </html>
