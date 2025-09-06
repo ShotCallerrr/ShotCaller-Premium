@@ -2,101 +2,161 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <title>ShotCaller Toss Exchange - Login</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>ShotCaller Toss Exchange</title>
   <style>
+    * { box-sizing: border-box; }
     body {
+      margin: 0;
       font-family: Arial, sans-serif;
       background: #0b1a2e;
       color: #fff;
-      margin: 0;
-      padding: 0;
     }
     header {
       background: #1f2e45;
       padding: 20px;
       text-align: center;
-      font-size: 28px;
+      font-size: 24px;
       font-weight: bold;
+      color: #ffa500;
       border-bottom: 3px solid #ffa500;
     }
     .container {
-      padding: 20px;
+      max-width: 400px;
+      margin: 40px auto;
+      background: #162b40;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #000;
+    }
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 15px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+    }
+    input {
+      background: #fff;
+      color: #000;
+    }
+    button {
+      background: #ffa500;
+      color: #000;
+      cursor: pointer;
     }
     .match {
-      background: #162b40;
-      border: 1px solid #ffa500;
-      padding: 20px;
-      margin-bottom: 20px;
+      background: #203a5c;
+      padding: 15px;
+      margin-top: 20px;
       border-radius: 8px;
     }
-    .match h2 {
+    .match h3 {
       margin: 0 0 10px;
       color: #ffa500;
     }
-    .team {
-      font-size: 18px;
-      margin: 5px 0;
-    }
-    .odds {
+    .bet-btn {
       margin-top: 10px;
+      display: flex;
+      gap: 10px;
     }
-    .odds button {
-      margin: 5px;
-      padding: 10px 15px;
-      font-size: 16px;
-      background: #ffa500;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      color: #000;
+    .bet-btn button {
+      flex: 1;
     }
-    .odds button:hover {
-      background: #ffcc66;
+    .balance {
+      font-size: 18px;
+      margin-top: 10px;
+      color: #4fffa0;
     }
-    footer {
-      text-align: center;
-      padding: 15px;
-      background: #1f2e45;
-      color: #aaa;
-      font-size: 14px;
+    .logout {
+      background: #ff4d4d;
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
-  <header>
-    ShotCaller Toss Exchange
-  </header>
 
-  <div class="container">
+<header>ShotCaller Toss Exchange</header>
 
-    <!-- Match 1 -->
-    <div class="match">
-      <h2>India vs Pakistan (Live)</h2>
-      <div class="team">Toss Winner: <strong>India</strong></div>
-      <div class="team">Match Status: <em>1st Innings - 10.2 overs</em></div>
-      <div class="odds">
-        <p><strong>Place Your Toss Bets:</strong></p>
-        <button>India - 1.75</button>
-        <button>Pakistan - 2.10</button>
-      </div>
+<div class="container" id="loginContainer">
+  <h2>Login</h2>
+  <input type="text" id="username" placeholder="Username">
+  <input type="password" id="password" placeholder="Password">
+  <button onclick="login()">Login</button>
+</div>
+
+<div class="container" id="dashboardContainer" style="display: none;">
+  <h2>Welcome, <span id="userNameDisplay"></span></h2>
+  <div class="balance">Balance: ₹<span id="userBalance"></span></div>
+
+  <div class="match">
+    <h3>India vs Pakistan</h3>
+    <p>Toss Winner?</p>
+    <div class="bet-btn">
+      <button onclick="placeBet('India')">India @1.85</button>
+      <button onclick="placeBet('Pakistan')">Pakistan @2.10</button>
     </div>
-
-    <!-- Match 2 -->
-    <div class="match">
-      <h2>Australia vs England (Upcoming)</h2>
-      <div class="team">Match Time: <strong>6:30 PM IST</strong></div>
-      <div class="odds">
-        <p><strong>Who Will Win the Toss?</strong></p>
-        <button>Australia - 1.90</button>
-        <button>England - 1.95</button>
-      </div>
-    </div>
-
   </div>
 
-  <footer>
-    &copy; 2025 ShotCaller Toss Exchange. All rights reserved.
-  </footer>
+  <div class="match">
+    <h3>Australia vs England</h3>
+    <p>Toss Winner?</p>
+    <div class="bet-btn">
+      <button onclick="placeBet('Australia')">Australia @1.90</button>
+      <button onclick="placeBet('England')">England @2.00</button>
+    </div>
+  </div>
+
+  <button class="logout" onclick="logout()">Logout</button>
+</div>
+
+<script>
+  // Simulated user database (admin manually adds users here)
+  const users = [
+    { username: "user1", password: "pass1", balance: 500 },
+    { username: "user2", password: "pass2", balance: 1000 },
+    { username: "demo", password: "demo", balance: 1500 },
+  ];
+
+  let currentUser = null;
+
+  function login() {
+    const username = document.getElementById("username").value.trim();
+    const password = document.getElementById("password").value.trim();
+
+    const user = users.find(u => u.username === username && u.password === password);
+
+    if (user) {
+      currentUser = user;
+      document.getElementById("loginContainer").style.display = "none";
+      document.getElementById("dashboardContainer").style.display = "block";
+      document.getElementById("userNameDisplay").textContent = user.username;
+      document.getElementById("userBalance").textContent = user.balance.toFixed(2);
+    } else {
+      alert("Invalid login. Please check username/password.");
+    }
+  }
+
+  function placeBet(team) {
+    const betAmount = 100; // fixed bet for demo
+    if (currentUser.balance >= betAmount) {
+      currentUser.balance -= betAmount;
+      alert(`Bet placed on ${team} for ₹${betAmount}`);
+      document.getElementById("userBalance").textContent = currentUser.balance.toFixed(2);
+    } else {
+      alert("Insufficient balance to place bet.");
+    }
+  }
+
+  function logout() {
+    currentUser = null;
+    document.getElementById("loginContainer").style.display = "block";
+    document.getElementById("dashboardContainer").style.display = "none";
+    document.getElementById("username").value = "";
+    document.getElementById("password").value = "";
+  }
+</script>
+
 </body>
 </html>
