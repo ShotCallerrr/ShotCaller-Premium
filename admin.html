@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Panel - ShotCaller</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #0b1a2e;
+      color: #fff;
+    }
+    header {
+      background: #1f2e45;
+      padding: 20px;
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+      color: #ffa500;
+      border-bottom: 3px solid #ffa500;
+    }
+    .container {
+      max-width: 800px;
+      margin: 40px auto;
+      background: #162b40;
+      padding: 30px;
+      border-radius: 10px;
+    }
+    input, button {
+      padding: 10px;
+      margin: 10px 5px 0 0;
+      font-size: 14px;
+      border: none;
+      border-radius: 5px;
+    }
+    input {
+      background: #fff;
+      color: #000;
+    }
+    button {
+      background: #ffa500;
+      color: #000;
+      cursor: pointer;
+    }
+    table {
+      width: 100%;
+      margin-top: 20px;
+      border-collapse: collapse;
+      background: #203a5c;
+    }
+    th, td {
+      padding: 12px;
+      border: 1px solid #ffa500;
+      text-align: left;
+    }
+    th {
+      background-color: #1f2e45;
+      color: #ffa500;
+    }
+    .logout {
+      background: #ff4d4d;
+      float: right;
+    }
+    .login-box {
+      max-width: 300px;
+      margin: 100px auto;
+      background: #162b40;
+      padding: 30px;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  Admin Panel - ShotCaller
+  <button class="logout" onclick="logout()">Logout</button>
+</header>
+
+<div class="login-box" id="adminLoginBox">
+  <h2>Admin Login</h2>
+  <input type="text" id="adminUser" placeholder="Admin Username">
+  <input type="password" id="adminPass" placeholder="Password">
+  <button onclick="adminLogin()">Login</button>
+</div>
+
+<div class="container" id="adminPanel" style="display: none;">
+  <h2>Manage Users</h2>
+
+  <!-- Add User -->
+  <h3>Add New User</h3>
+  <input type="text" id="newUsername" placeholder="Username">
+  <input type="password" id="newPassword" placeholder="Password">
+  <input type="number" id="newBalance" placeholder="Initial Balance">
+  <button onclick="addUser()">Add User</button>
+
+  <!-- Update Balance -->
+  <h3>Update Balance</h3>
+  <input type="text" id="updateUsername" placeholder="Username">
+  <input type="number" id="updateAmount" placeholder="New Balance">
+  <button onclick="updateBalance()">Update Balance</button>
+
+  <!-- User Table -->
+  <h3>All Users</h3>
+  <table id="userTable">
+    <thead>
+      <tr>
+        <th>Username</th>
+        <th>Password</th>
+        <th>Balance (₹)</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</div>
+
+<script>
+  // Simulated user database (shared from index.html)
+  let users = [
+    { username: "user1", password: "pass1", balance: 500 },
+    { username: "user2", password: "pass2", balance: 1000 },
+    { username: "demo", password: "demo", balance: 1500 },
+  ];
+
+  const adminCredentials = {
+    username: "admin",
+    password: "admin123"
+  };
+
+  function adminLogin() {
+    const user = document.getElementById("adminUser").value;
+    const pass = document.getElementById("adminPass").value;
+
+    if (user === adminCredentials.username && pass === adminCredentials.password) {
+      document.getElementById("adminLoginBox").style.display = "none";
+      document.getElementById("adminPanel").style.display = "block";
+      renderUserTable();
+    } else {
+      alert("Invalid admin credentials.");
+    }
+  }
+
+  function logout() {
+    location.reload();
+  }
+
+  function addUser() {
+    const username = document.getElementById("newUsername").value.trim();
+    const password = document.getElementById("newPassword").value.trim();
+    const balance = parseFloat(document.getElementById("newBalance").value);
+
+    if (!username || !password || isNaN(balance)) {
+      alert("Please fill all fields correctly.");
+      return;
+    }
+
+    if (users.some(u => u.username === username)) {
+      alert("User already exists.");
+      return;
+    }
+
+    users.push({ username, password, balance });
+    alert("User added successfully.");
+    renderUserTable();
+    document.getElementById("newUsername").value = '';
+    document.getElementById("newPassword").value = '';
+    document.getElementById("newBalance").value = '';
+  }
+
+  function updateBalance() {
+    const username = document.getElementById("updateUsername").value.trim();
+    const amount = parseFloat(document.getElementById("updateAmount").value);
+
+    const user = users.find(u => u.username === username);
+    if (!user) {
+      alert("User not found.");
+      return;
+    }
+
+    if (isNaN(amount)) {
+      alert("Invalid balance amount.");
+      return;
+    }
+
+    user.balance = amount;
+    alert("Balance updated.");
+    renderUserTable();
+  }
+
+  function renderUserTable() {
+    const tbody = document.querySelector("#userTable tbody");
+    tbody.innerHTML = "";
+
+    users.forEach(user => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${user.username}</td>
+        <td>${user.password}</td>
+        <td>₹${user.balance.toFixed(2)}</td>
+      `;
+      tbody.appendChild(row);
+    });
+  }
+</script>
+
+</body>
+</html>
