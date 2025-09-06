@@ -1,16 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>ShotCaller Toss Exchange - Login</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <title>ShotCaller Toss Exchange</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    * { box-sizing: border-box; }
     body {
-      margin: 0;
       font-family: Arial, sans-serif;
       background: #0b1a2e;
       color: #fff;
+      margin: 0;
     }
     header {
       background: #1f2e45;
@@ -19,25 +18,23 @@
       font-size: 24px;
       font-weight: bold;
       color: #ffa500;
-      border-bottom: 3px solid #ffa500;
     }
     .container {
-      max-width: 400px;
-      margin: 40px auto;
+      max-width: 600px;
+      margin: 30px auto;
       background: #162b40;
-      padding: 30px;
+      padding: 25px;
       border-radius: 10px;
-      box-shadow: 0 0 10px #000;
     }
     input, button {
-      width: 100%;
       padding: 10px;
-      margin-top: 15px;
-      font-size: 16px;
+      margin-top: 10px;
+      font-size: 14px;
       border: none;
       border-radius: 5px;
     }
-    input {
+    input[type="number"], input[type="text"] {
+      width: 100%;
       background: #fff;
       color: #000;
     }
@@ -53,27 +50,29 @@
       border-radius: 8px;
     }
     .match h3 {
-      margin: 0 0 10px;
       color: #ffa500;
+      margin: 0;
     }
-    .bet-btn {
-      margin-top: 10px;
+    .bet-btns {
       display: flex;
       gap: 10px;
-      flex-direction: column;
-    }
-    .bet-btn input {
-      margin-top: 0;
-      margin-bottom: 10px;
+      margin-top: 10px;
     }
     .balance {
-      font-size: 18px;
-      margin-top: 10px;
       color: #4fffa0;
+      margin-top: 10px;
+    }
+    .disabled {
+      background: #999 !important;
+      cursor: not-allowed;
     }
     .logout {
       background: #ff4d4d;
       margin-top: 20px;
+    }
+    .result {
+      margin-top: 10px;
+      font-weight: bold;
     }
   </style>
 </head>
@@ -83,8 +82,8 @@
 
 <div class="container" id="loginContainer">
   <h2>Login</h2>
-  <input type="text" id="username" placeholder="Username">
-  <input type="password" id="password" placeholder="Password">
+  <input type="text" id="username" placeholder="Username" />
+  <input type="password" id="password" placeholder="Password" />
   <button onclick="login()">Login</button>
 </div>
 
@@ -92,89 +91,146 @@
   <h2>Welcome, <span id="userNameDisplay"></span></h2>
   <div class="balance">Balance: ₹<span id="userBalance"></span></div>
 
-  <div class="match">
-    <h3>India vs Pakistan</h3>
-    <p>Who will win the toss?</p>
-    <div class="bet-btn">
-      <input type="number" id="betAmount1" placeholder="Enter bet amount (₹100-₹300)">
-      <button onclick="placeBet('India', 'betAmount1')">India @1.85</button>
-      <button onclick="placeBet('Pakistan', 'betAmount1')">Pakistan @2.10</button>
-    </div>
-  </div>
-
-  <div class="match">
-    <h3>Australia vs England</h3>
-    <p>Who will win the toss?</p>
-    <div class="bet-btn">
-      <input type="number" id="betAmount2" placeholder="Enter bet amount (₹100-₹300)">
-      <button onclick="placeBet('Australia', 'betAmount2')">Australia @1.90</button>
-      <button onclick="placeBet('England', 'betAmount2')">England @2.00</button>
-    </div>
-  </div>
+  <!-- Matches Area -->
+  <div id="matchesContainer"></div>
 
   <button class="logout" onclick="logout()">Logout</button>
 </div>
 
 <script>
-  // Simulated user database
+  // --- Fake Users Database ---
   const users = [
-    { username: "AkshayAnalyst", password: "pass1", balance: 500 }
+    { username: "cyrus344", password: "cyrus344", balance: 1000 }
   ];
 
   let currentUser = null;
+  let userBets = {}; // Stores bets per match
+
+  // --- Match Setup ---
+  const matches = [
+    {
+      id: "eng-sa",
+      teams: "England vs South Africa",
+      tossTime: new Date(Date.now() + 20 * 60 * 1000), // 20 mins from now
+    },
+    {
+      id: "zim-sl",
+      teams: "Zimbabwe vs Sri Lanka",
+      tossTime: new Date(Date.now() + 40 * 60 * 1000), // 40 mins
+    },
+    {
+      id: "pak-afg",
+      teams: "Pakistan vs Afghanistan",
+      tossTime: new Date(Date.now() + 60 * 60 * 1000), // 60 mins
+    },
+  ];
+
+  const ODDS = 1.9;
 
   function login() {
     const username = document.getElementById("username").value.trim();
     const password = document.getElementById("password").value.trim();
-
-    const user = users.find(u => u.username === username && u.password === password);
+    const user = users.find((u) => u.username === username && u.password === password);
 
     if (user) {
       currentUser = user;
+      userBets = {};
       document.getElementById("loginContainer").style.display = "none";
       document.getElementById("dashboardContainer").style.display = "block";
       document.getElementById("userNameDisplay").textContent = user.username;
-      document.getElementById("userBalance").textContent = user.balance.toFixed(2);
+      updateBalance();
+      renderMatches();
     } else {
-      alert("Invalid login. Please check username/password.");
-    }
-  }
-
-  function placeBet(team, inputId) {
-    const betAmount = parseInt(document.getElementById(inputId).value);
-    if (isNaN(betAmount)) {
-      alert("Please enter a valid bet amount.");
-      return;
-    }
-
-    if (betAmount < 100) {
-      alert("Minimum bet amount is ₹100.");
-      return;
-    }
-
-    if (betAmount > 300) {
-      alert("Maximum bet amount is ₹300.");
-      return;
-    }
-
-    if (currentUser.balance >= betAmount) {
-      currentUser.balance -= betAmount;
-      alert(`Bet of ₹${betAmount} placed on ${team}`);
-      document.getElementById("userBalance").textContent = currentUser.balance.toFixed(2);
-      document.getElementById(inputId).value = ""; // Clear the input field
-    } else {
-      alert("Insufficient balance to place this bet.");
+      alert("Invalid credentials.");
     }
   }
 
   function logout() {
     currentUser = null;
-    document.getElementById("loginContainer").style.display = "block";
+    userBets = {};
     document.getElementById("dashboardContainer").style.display = "none";
+    document.getElementById("loginContainer").style.display = "block";
     document.getElementById("username").value = "";
     document.getElementById("password").value = "";
   }
-</script>
 
-</body>
-</html>
+  function updateBalance() {
+    document.getElementById("userBalance").textContent = currentUser.balance.toFixed(2);
+  }
+
+  function renderMatches() {
+    const container = document.getElementById("matchesContainer");
+    container.innerHTML = "";
+
+    matches.forEach((match) => {
+      const now = new Date();
+      const timeLeft = Math.floor((match.tossTime - now) / 60000);
+      const isOpen = now < match.tossTime;
+
+      const div = document.createElement("div");
+      div.className = "match";
+      div.innerHTML = `
+        <h3>${match.teams}</h3>
+        <div>${isOpen ? `Toss betting open - ${timeLeft} min left` : "<span style='color:red;'>Toss betting closed</span>"}</div>
+        <input type="number" id="amount-${match.id}" placeholder="Enter Amount (100–300)" />
+        <div class="bet-btns">
+          <button id="btn-${match.id}-team1" ${!isOpen ? "disabled class='disabled'" : ""} onclick="placeBet('${match.id}', '${match.teams.split(' vs ')[0]}')">
+            ${match.teams.split(" vs ")[0]} @1.90
+          </button>
+          <button id="btn-${match.id}-team2" ${!isOpen ? "disabled class='disabled'" : ""} onclick="placeBet('${match.id}', '${match.teams.split(' vs ')[1]}')">
+            ${match.teams.split(" vs ")[1]} @1.90
+          </button>
+        </div>
+        <div class="result" id="result-${match.id}"></div>
+        <input type="text" id="result-input-${match.id}" placeholder="Admin: Enter Toss Winner" />
+        <button onclick="settleBet('${match.id}')">Settle Bet</button>
+      `;
+      container.appendChild(div);
+    });
+  }
+
+  function placeBet(matchId, team) {
+    const input = document.getElementById(`amount-${matchId}`);
+    const amount = parseInt(input.value);
+    if (isNaN(amount) || amount < 100 || amount > 300) {
+      alert("Enter amount between ₹100 and ₹300");
+      return;
+    }
+
+    if (currentUser.balance < amount) {
+      alert("Insufficient balance");
+      return;
+    }
+
+    if (userBets[matchId]) {
+      alert("Bet already placed for this match.");
+      return;
+    }
+
+    userBets[matchId] = { team, amount };
+    currentUser.balance -= amount;
+    updateBalance();
+
+    document.getElementById(`result-${matchId}`).textContent = `Bet placed on ${team} for ₹${amount}`;
+    input.value = "";
+  }
+
+  function settleBet(matchId) {
+    const resultInput = document.getElementById(`result-input-${matchId}`);
+    const winner = resultInput.value.trim();
+    const bet = userBets[matchId];
+
+    if (!bet) {
+      alert("No bet placed for this match.");
+      return;
+    }
+
+    if (!winner) {
+      alert("Enter toss winner team.");
+      return;
+    }
+
+    if (bet.team.toLowerCase() === winner.toLowerCase()) {
+      const winAmount = bet.amount * ODDS;
+      currentUser.balance += win
+
