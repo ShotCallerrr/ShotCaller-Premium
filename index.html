@@ -119,6 +119,14 @@
   <input type="password" id="password" placeholder="Password" autocomplete="off" />
   <button onclick="login()">Login</button>
 
+  <p style="margin-top:20px; font-size:14px; color:#aaa;">
+    <strong>User Accounts:</strong><br/>
+    user1 / pass1<br/>
+    demo / demo<br/>
+    <strong>Admin Account:</strong><br/>
+    admin / admin123
+  </p>
+</div>
 
 <!-- USER PANEL -->
 <div class="container" id="userPanel">
@@ -167,6 +175,10 @@
 
   // Store all bets: { username: [ { matchId, team, amount, odds, settled, win, placedAt } ] }
   const allBets = {};
+
+  // MIN/MAX BET LIMITS
+  const MIN_BET = 10;
+  const MAX_BET = 200;
 
   // ---- LOGIN ----
   function login() {
@@ -228,8 +240,8 @@
       div.innerHTML = `
         <h3>${match.teams[0]} vs ${match.teams[1]} - Toss</h3>
         <div>${isOpen ? `Toss betting open - ${timeLeftMins} min left` : `<span style="color:#ff4d4d;">Toss betting closed</span>`}</div>
-        <label for="amount-${match.id}">Bet Amount (₹100–₹300):</label>
-        <input type="number" id="amount-${match.id}" min="100" max="300" placeholder="Enter bet amount" ${!isOpen ? "disabled" : ""} />
+        <label for="amount-${match.id}">Bet Amount (₹${MIN_BET}–₹${MAX_BET}):</label>
+        <input type="number" id="amount-${match.id}" min="${MIN_BET}" max="${MAX_BET}" placeholder="Enter bet amount" ${!isOpen ? "disabled" : ""} />
         <div class="bet-btns">
           <button id="btn-${match.id}-1" ${!isOpen ? "disabled class='disabled'" : ""} onclick="placeBet('${match.id}', '${match.teams[0]}')">${match.teams[0]} @1.90</button>
           <button id="btn-${match.id}-2" ${!isOpen ? "disabled class='disabled'" : ""} onclick="placeBet('${match.id}', '${match.teams[1]}')">${match.teams[1]} @1.90</button>
@@ -257,8 +269,8 @@
 
     const amountInput = document.getElementById(`amount-${matchId}`);
     const amount = parseInt(amountInput.value);
-    if (isNaN(amount) || amount < 100 || amount > 300) {
-      alert("Please enter a bet amount between ₹100 and ₹300.");
+    if (isNaN(amount) || amount < MIN_BET || amount > MAX_BET) {
+      alert(`Please enter a bet amount between ₹${MIN_BET} and ₹${MAX_BET}.`);
       return;
     }
 
