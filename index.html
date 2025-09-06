@@ -9,13 +9,13 @@
       font-family: Arial, sans-serif;
       background: #0b1a2e;
       color: #fff;
-      margin: 0;
+      margin: 0; padding: 0;
     }
     header {
       background: #1f2e45;
       padding: 20px;
       text-align: center;
-      font-size: 24px;
+      font-size: 26px;
       font-weight: bold;
       color: #ffa500;
     }
@@ -29,12 +29,13 @@
     input, button {
       padding: 10px;
       margin-top: 10px;
-      font-size: 14px;
+      font-size: 16px;
       border: none;
       border-radius: 5px;
-    }
-    input[type="number"], input[type="text"] {
+      display: block;
       width: 100%;
+    }
+    input[type="number"], input[type="text"], input[type="password"] {
       background: #fff;
       color: #000;
     }
@@ -46,32 +47,44 @@
     .match {
       background: #203a5c;
       padding: 15px;
-      margin-top: 20px;
+      margin-top: 25px;
       border-radius: 8px;
     }
     .match h3 {
       color: #ffa500;
-      margin: 0;
+      margin: 0 0 8px 0;
     }
     .bet-btns {
       display: flex;
       gap: 10px;
       margin-top: 10px;
     }
-    .balance {
-      color: #4fffa0;
-      margin-top: 10px;
+    .bet-btns button {
+      flex: 1;
+      font-weight: bold;
     }
     .disabled {
-      background: #999 !important;
+      background: #555 !important;
       cursor: not-allowed;
+    }
+    .balance {
+      color: #4fffa0;
+      font-size: 18px;
+      margin-top: 10px;
+      font-weight: bold;
     }
     .logout {
       background: #ff4d4d;
-      margin-top: 20px;
+      margin-top: 25px;
     }
     .result {
       margin-top: 10px;
+      font-weight: bold;
+      min-height: 20px;
+    }
+    label {
+      margin-top: 15px;
+      display: block;
       font-weight: bold;
     }
   </style>
@@ -82,69 +95,77 @@
 
 <div class="container" id="loginContainer">
   <h2>Login</h2>
-  <input type="text" id="username" placeholder="Username" />
-  <input type="password" id="password" placeholder="Password" />
+  <input type="text" id="username" placeholder="Username" autocomplete="off" />
+  <input type="password" id="password" placeholder="Password" autocomplete="off" />
   <button onclick="login()">Login</button>
 </div>
 
-<div class="container" id="dashboardContainer" style="display: none;">
+<div class="container" id="dashboardContainer" style="display:none;">
   <h2>Welcome, <span id="userNameDisplay"></span></h2>
   <div class="balance">Balance: ₹<span id="userBalance"></span></div>
 
-  <!-- Matches Area -->
   <div id="matchesContainer"></div>
 
   <button class="logout" onclick="logout()">Logout</button>
 </div>
 
 <script>
-  // --- Fake Users Database ---
+  // === Users database (hardcoded) ===
   const users = [
-    { username: "cyrus344", password: "cyrus344", balance: 1000 }
+    { username: "user1", password: "pass1", balance: 1000 },
+    { username: "demo", password: "demo", balance: 500 },
   ];
 
   let currentUser = null;
-  let userBets = {}; // Stores bets per match
+  // Store user bets keyed by match id
+  let userBets = {};
 
-  // --- Match Setup ---
+  // Fixed odds
+  const ODDS = 1.9;
+
+  // Matches config: tossTime is Date object in future (simulate real time)
   const matches = [
     {
       id: "eng-sa",
-      teams: "England vs South Africa",
+      teams: ["England", "South Africa"],
       tossTime: new Date(Date.now() + 20 * 60 * 1000), // 20 mins from now
     },
     {
       id: "zim-sl",
-      teams: "Zimbabwe vs Sri Lanka",
-      tossTime: new Date(Date.now() + 40 * 60 * 1000), // 40 mins
+      teams: ["Zimbabwe", "Sri Lanka"],
+      tossTime: new Date(Date.now() + 40 * 60 * 1000), // 40 mins from now
     },
     {
       id: "pak-afg",
-      teams: "Pakistan vs Afghanistan",
-      tossTime: new Date(Date.now() + 60 * 60 * 1000), // 60 mins
+      teams: ["Pakistan", "Afghanistan"],
+      tossTime: new Date(Date.now() + 60 * 60 * 1000), // 60 mins from now
     },
   ];
 
-  const ODDS = 1.9;
-
+  // --- Login Function ---
   function login() {
     const username = document.getElementById("username").value.trim();
     const password = document.getElementById("password").value.trim();
-    const user = users.find((u) => u.username === username && u.password === password);
 
-    if (user) {
-      currentUser = user;
-      userBets = {};
-      document.getElementById("loginContainer").style.display = "none";
-      document.getElementById("dashboardContainer").style.display = "block";
-      document.getElementById("userNameDisplay").textContent = user.username;
-      updateBalance();
-      renderMatches();
-    } else {
-      alert("Invalid credentials.");
+    const user = users.find(
+      (u) => u.username === username && u.password === password
+    );
+    if (!user) {
+      alert("Invalid username or password");
+      return;
     }
+
+    currentUser = user;
+    userBets = {};
+    document.getElementById("loginContainer").style.display = "none";
+    document.getElementById("dashboardContainer").style.display = "block";
+
+    document.getElementById("userNameDisplay").textContent = currentUser.username;
+    updateBalance();
+    renderMatches();
   }
 
+  // --- Logout Function ---
   function logout() {
     currentUser = null;
     userBets = {};
@@ -154,10 +175,13 @@
     document.getElementById("password").value = "";
   }
 
+  // --- Update Balance Display ---
   function updateBalance() {
-    document.getElementById("userBalance").textContent = currentUser.balance.toFixed(2);
+    document.getElementById("userBalance").textContent =
+      currentUser.balance.toFixed(2);
   }
 
+  // --- Render all matches UI ---
   function renderMatches() {
     const container = document.getElementById("matchesContainer");
     container.innerHTML = "";
@@ -167,70 +191,132 @@
       const timeLeft = Math.floor((match.tossTime - now) / 60000);
       const isOpen = now < match.tossTime;
 
-      const div = document.createElement("div");
-      div.className = "match";
-      div.innerHTML = `
-        <h3>${match.teams}</h3>
-        <div>${isOpen ? `Toss betting open - ${timeLeft} min left` : "<span style='color:red;'>Toss betting closed</span>"}</div>
-        <input type="number" id="amount-${match.id}" placeholder="Enter Amount (100–300)" />
+      // Create match div
+      const matchDiv = document.createElement("div");
+      matchDiv.className = "match";
+
+      // Match teams string
+      const teamsStr = match.teams.join(" vs ");
+
+      // Create HTML inside match div
+      matchDiv.innerHTML = `
+        <h3>${teamsStr} - Toss</h3>
+        <div>${isOpen ? `Toss betting open - ${timeLeft} min left` : "<span style='color:#ff4d4d;'>Toss betting closed</span>"}</div>
+        <label for="amount-${match.id}">Bet Amount (₹100–₹300):</label>
+        <input type="number" id="amount-${match.id}" min="100" max="300" placeholder="Enter bet amount" ${!isOpen ? "disabled" : ""} />
         <div class="bet-btns">
-          <button id="btn-${match.id}-team1" ${!isOpen ? "disabled class='disabled'" : ""} onclick="placeBet('${match.id}', '${match.teams.split(' vs ')[0]}')">
-            ${match.teams.split(" vs ")[0]} @1.90
-          </button>
-          <button id="btn-${match.id}-team2" ${!isOpen ? "disabled class='disabled'" : ""} onclick="placeBet('${match.id}', '${match.teams.split(' vs ')[1]}')">
-            ${match.teams.split(" vs ")[1]} @1.90
-          </button>
+          <button id="btn-${match.id}-1" ${!isOpen ? "disabled class='disabled'" : ""} onclick="placeBet('${match.id}', '${match.teams[0]}')">${match.teams[0]} @1.90</button>
+          <button id="btn-${match.id}-2" ${!isOpen ? "disabled class='disabled'" : ""} onclick="placeBet('${match.id}', '${match.teams[1]}')">${match.teams[1]} @1.90</button>
         </div>
         <div class="result" id="result-${match.id}"></div>
-        <input type="text" id="result-input-${match.id}" placeholder="Admin: Enter Toss Winner" />
+        <label for="result-input-${match.id}">Admin: Enter Toss Winner (Exact team name)</label>
+        <input type="text" id="result-input-${match.id}" placeholder="e.g. ${match.teams[0]} or ${match.teams[1]}" />
         <button onclick="settleBet('${match.id}')">Settle Bet</button>
       `;
-      container.appendChild(div);
+
+      container.appendChild(matchDiv);
     });
   }
 
+  // --- Place Bet ---
   function placeBet(matchId, team) {
-    const input = document.getElementById(`amount-${matchId}`);
-    const amount = parseInt(input.value);
-    if (isNaN(amount) || amount < 100 || amount > 300) {
-      alert("Enter amount between ₹100 and ₹300");
-      return;
-    }
-
-    if (currentUser.balance < amount) {
-      alert("Insufficient balance");
+    if (!currentUser) {
+      alert("Please login first.");
       return;
     }
 
     if (userBets[matchId]) {
-      alert("Bet already placed for this match.");
+      alert("You already placed a bet on this match.");
       return;
     }
 
-    userBets[matchId] = { team, amount };
+    const amountInput = document.getElementById(`amount-${matchId}`);
+    const amount = parseInt(amountInput.value);
+    if (isNaN(amount) || amount < 100 || amount > 300) {
+      alert("Please enter a bet amount between ₹100 and ₹300.");
+      return;
+    }
+
+    if (currentUser.balance < amount) {
+      alert("Insufficient balance to place bet.");
+      return;
+    }
+
+    // Deduct amount immediately
     currentUser.balance -= amount;
     updateBalance();
 
-    document.getElementById(`result-${matchId}`).textContent = `Bet placed on ${team} for ₹${amount}`;
-    input.value = "";
+    // Save bet
+    userBets[matchId] = {
+      team,
+      amount,
+      odds: ODDS,
+    };
+
+    // Show bet placed message
+    const resultDiv = document.getElementById(`result-${matchId}`);
+    resultDiv.style.color = "#4fffa0";
+    resultDiv.textContent = `Bet placed on ${team} for ₹${amount}`;
+
+    // Clear input amount
+    amountInput.value = "";
   }
 
+  // --- Settle Bet (Admin function) ---
   function settleBet(matchId) {
-    const resultInput = document.getElementById(`result-input-${matchId}`);
-    const winner = resultInput.value.trim();
-    const bet = userBets[matchId];
-
-    if (!bet) {
-      alert("No bet placed for this match.");
-      return;
-    }
+    const winnerInput = document.getElementById(`result-input-${matchId}`);
+    const winner = winnerInput.value.trim();
 
     if (!winner) {
-      alert("Enter toss winner team.");
+      alert("Please enter toss winner team.");
       return;
     }
 
-    if (bet.team.toLowerCase() === winner.toLowerCase()) {
-      const winAmount = bet.amount * ODDS;
-      currentUser.balance += win
+    if (!userBets[matchId]) {
+      alert("No bet placed by user on this match.");
+      return;
+    }
 
+    const bet = userBets[matchId];
+    const resultDiv = document.getElementById(`result-${matchId}`);
+
+    if (bet.team.toLowerCase() === winner.toLowerCase()) {
+      // Win: pay odds * amount
+      const payout = bet.amount * bet.odds;
+      currentUser.balance += payout;
+
+      resultDiv.style.color = "#00ff00";
+      resultDiv.textContent = `You won ₹${(payout - bet.amount).toFixed(2)} on ${bet.team}! Balance updated.`;
+    } else {
+      resultDiv.style.color = "#ff5555";
+      resultDiv.textContent = `You lost ₹${bet.amount} on ${bet.team}. Better luck next time!`;
+    }
+
+    // Remove bet after settlement
+    delete userBets[matchId];
+    updateBalance();
+
+    // Clear admin input for next round
+    winnerInput.value = "";
+  }
+
+  // Optional: Refresh match states every 30 seconds (to disable bets after toss)
+  setInterval(() => {
+    if (currentUser) {
+      renderMatches();
+      // Re-show bet placed messages after re-render by saving last state:
+      for (const matchId in userBets) {
+        const bet = userBets[matchId];
+        const resultDiv = document.getElementById(`result-${matchId}`);
+        if(resultDiv) {
+          resultDiv.style.color = "#4fffa0";
+          resultDiv.textContent = `Bet placed on ${bet.team} for ₹${bet.amount}`;
+        }
+      }
+      updateBalance();
+    }
+  }, 30000);
+</script>
+
+</body>
+</html>
