@@ -155,7 +155,7 @@
 
 <script>
   // --- USERS ---
-  const users = [
+  let users = [
     { username: "user1", password: "pass1", balance: 1000, role: "user" },
     { username: "demo", password: "demo", balance: 500, role: "user" },
     { username: "admin", password: "admin123", role: "admin" }
@@ -164,7 +164,6 @@
   let currentUser = null;
 
   // --- MATCHES ---
-  // Toss time in minutes from page load (for demo)
   const matches = [
     { id: "eng-sa", teams: ["England", "South Africa"], tossTime: new Date(Date.now() + 20 * 60000) },
     { id: "zim-sl", teams: ["Zimbabwe", "Sri Lanka"], tossTime: new Date(Date.now() + 40 * 60000) },
@@ -174,13 +173,53 @@
   const ODDS = 1.9;
 
   // Store all bets: { username: [ { matchId, team, amount, odds, settled, win, placedAt } ] }
-  const allBets = {};
+  let allBets = {};
 
-  // MIN/MAX BET LIMITS
   const MIN_BET = 10;
   const MAX_BET = 200;
 
-  // ---- LOGIN ----
+  // --- LOCAL STORAGE FUNCTIONS ---
+  function saveData() {
+    localStorage.setItem('shotcaller_users', JSON.stringify(users));
+    localStorage.setItem('shotcaller_bets', JSON.stringify(allBets));
+    localStorage.setItem('shotcaller_currentUser', JSON.stringify(currentUser));
+  }
+
+  function loadData() {
+    const savedUsers = localStorage.getItem('shotcaller_users');
+    const savedBets = localStorage.getItem('shotcaller_bets');
+    const savedCurrentUser = localStorage.getItem('shotcaller_currentUser');
+
+    if (savedUsers) {
+      const parsedUsers = JSON.parse(savedUsers);
+      // Merge balances and roles but keep passwords from initial
+      parsedUsers.forEach(savedUser => {
+        const userIndex = users.findIndex(u => u.username === savedUser.username);
+        if (userIndex !== -1) {
+          users[userIndex].balance = savedUser.balance;
+          users[userIndex].role = savedUser.role;
+        } else {
+          // New user from storage? Add them
+          users.push(savedUser);
+        }
+      });
+    }
+
+    if (savedBets) {
+      allBets = JSON.parse(savedBets);
+    }
+
+    if (savedCurrentUser) {
+      currentUser = JSON.parse(savedCurrentUser);
+      if (currentUser) {
+        // Refresh balance from users array for safety
+        const usr = users.find(u => u.username === currentUser.username);
+        if (usr) currentUser.balance = usr.balance;
+      }
+    }
+  }
+
+  // --- LOGIN ---
   function login() {
     const username = document.getElementById("username").value.trim();
     const password = document.getElementById("password").value.trim();
@@ -207,6 +246,8 @@
       renderUserBets();
       document.getElementById("userNameDisplay").textContent = currentUser.username;
     }
+
+    saveData();
   }
 
   // --- LOGOUT ---
@@ -218,6 +259,8 @@
 
     document.getElementById("username").value = "";
     document.getElementById("password").value = "";
+
+    saveData();
   }
 
   // --- USER FUNCTIONS ---
@@ -263,69 +306,91 @@
     if (!match) return;
 
     if (now >= match.tossTime) {
-      alert("Toss betting is closed for this match.");
+      alert("Toss betting closed for this match.");
       return;
     }
 
-    const amountInput = document.getElementById(`amount-${matchId}`);
-    const amount = parseInt(amountInput.value);
-    if (isNaN(amount) || amount < MIN_BET || amount > MAX_BET) {
-      alert(`Please enter a bet amount between ₹${MIN_BET} and ₹${MAX_BET}.`);
+    const input = document.getElementById(`amount-${matchId}`);
+    const amount = parseFloat(input.value);
+    if (isNaN(amount)) {
+      alert("Please enter a valid bet amount.");
       return;
     }
-
-    if (currentUser.balance < amount) {
-      alert("Insufficient balance to place bet.");
+    if (amount < MIN_BET || amount > MAX_BET) {
+      alert(`Bet amount must be between ₹${MIN_BET} and ₹${MAX_BET}.`);
       return;
     }
-
-    const userBets = allBets[currentUser.username];
-    // Check if active bet on same match exists
-    if (userBets.some(b => b.matchId === matchId && !b.settled)) {
-      alert("You already have an active bet on this match.");
+    if (amount > currentUser.balance) {
+      alert("Insufficient balance.");
       return;
     }
 
     // Deduct balance immediately
     currentUser.balance -= amount;
-    updateBalance();
 
-    // Save bet
-    userBets.push({
+    // Update global user list balance for persistence
+    const userInList = users.find(u => u.username === currentUser.username);
+    if (userInList) userInList.balance = currentUser.balance;
+
+    // Store bet
+    if (!allBets[currentUser.username]) allBets[currentUser.username] = [];
+    allBets[currentUser.username].push({
       matchId,
       team,
       amount,
       odds: ODDS,
       settled: false,
       win: null,
-      placedAt: new Date()
+      placedAt: new Date().toISOString()
     });
 
-    document.getElementById(`result-${matchId}`).textContent = `Bet placed on ${team} for ₹${amount.toFixed(2)}`;
+    input.value = "";
+
+    updateBalance();
     renderUserBets();
-    amountInput.value = "";
+
+    alert(`Bet placed: ₹${amount} on ${team} toss @1.90`);
+
+    saveData();
   }
 
   function renderUserBets() {
     const container = document.getElementById("userBetsList");
-    const bets = allBets[currentUser.username].filter(b => !b.settled);
-    if (bets.length === 0) {
+    if (!allBets[currentUser.username] || allBets[currentUser.username].length === 0) {
       container.textContent = "No active bets placed.";
       return;
     }
 
-    container.innerHTML = "";
+    const bets = allBets[currentUser.username].slice().reverse(); // latest first
+
+    let html = "<table><thead><tr><th>Match</th><th>Bet On</th><th>Amount (₹)</th><th>Odds</th><th>Status</th></tr></thead><tbody>";
+
     bets.forEach(bet => {
       const match = matches.find(m => m.id === bet.matchId);
       const matchName = match ? `${match.teams[0]} vs ${match.teams[1]}` : bet.matchId;
-      const div = document.createElement("div");
-      div.textContent = `Match: ${matchName} | Bet on: ${bet.team} | Amount: ₹${bet.amount.toFixed(2)} | Odds: ${bet.odds}`;
-      container.appendChild(div);
+
+      let status = "Pending";
+      if (bet.settled) {
+        status = bet.win ? "<span style='color:#4fffa0;'>Won</span>" : "<span style='color:#ff4d4d;'>Lost</span>";
+      } else {
+        const now = new Date();
+        if (now >= match.tossTime) status = "Awaiting result";
+      }
+
+      html += `<tr>
+        <td>${matchName}</td>
+        <td>${bet.team}</td>
+        <td>${bet.amount.toFixed(2)}</td>
+        <td>${bet.odds.toFixed(2)}</td>
+        <td>${status}</td>
+      </tr>`;
     });
+
+    html += "</tbody></table>";
+    container.innerHTML = html;
   }
 
   // --- ADMIN FUNCTIONS ---
-
   function renderAdminMatches() {
     const container = document.getElementById("adminMatches");
     container.innerHTML = "";
@@ -333,35 +398,47 @@
     const now = new Date();
 
     matches.forEach(match => {
-      const timeLeftMins = Math.floor((match.tossTime - now) / 60000);
-      const isOpen = now < match.tossTime;
+      const matchBets = [];
+      for (const username in allBets) {
+        allBets[username].forEach(bet => {
+          if (bet.matchId === match.id && !bet.settled) {
+            matchBets.push({ username, bet });
+          }
+        });
+      }
 
       const div = document.createElement("div");
       div.className = "match";
 
-      div.innerHTML = `
-        <h3>${match.teams[0]} vs ${match.teams[1]} - Toss</h3>
-        <div>${isOpen ? `Toss betting open - ${timeLeftMins} min left` : `<span style="color:#ff4d4d;">Toss betting closed</span>`}</div>
+      let settledResult = "Not settled";
+      const anySettled = matchBets.some(({bet}) => bet.settled === true);
+      if (anySettled) {
+        const wonBet = matchBets.find(({bet}) => bet.settled && bet.win);
+        if (wonBet) settledResult = `Toss won by ${wonBet.bet.team}`;
+      }
 
-        <label for="tossWinner-${match.id}">Set Toss Winner:</label>
+      div.innerHTML = `
+        <h3>${match.teams[0]} vs ${match.teams[1]}</h3>
+        <div><strong>Toss Time:</strong> ${match.tossTime.toLocaleString()}</div>
+        <div><strong>Current result:</strong> ${settledResult}</div>
+        <label>Set toss winner:</label>
         <select id="tossWinner-${match.id}">
-          <option value="">-- Select Winner --</option>
+          <option value="">Select winner</option>
           <option value="${match.teams[0]}">${match.teams[0]}</option>
           <option value="${match.teams[1]}">${match.teams[1]}</option>
         </select>
         <button onclick="settleBets('${match.id}')">Settle Bets</button>
-        <div class="result" id="admin-result-${match.id}"></div>
+        <div id="admin-result-${match.id}" class="result"></div>
       `;
-
       container.appendChild(div);
     });
   }
 
   function settleBets(matchId) {
-    const select = document.getElementById(`tossWinner-${matchId}`);
-    const winner = select.value;
+    const winnerSelect = document.getElementById(`tossWinner-${matchId}`);
+    const winner = winnerSelect.value;
     if (!winner) {
-      alert("Please select a toss winner.");
+      alert("Please select the toss winner.");
       return;
     }
 
@@ -369,21 +446,16 @@
     let winnersCount = 0;
     let losersCount = 0;
 
-    // Loop through all users
     for (const username in allBets) {
       const user = users.find(u => u.username === username);
-      if (!user) continue;
-
-      const bets = allBets[username];
-      bets.forEach(bet => {
+      allBets[username].forEach(bet => {
         if (bet.matchId === matchId && !bet.settled) {
           bet.settled = true;
-          betsSettled++;
           if (bet.team === winner) {
             bet.win = true;
-            // Pay winning amount to user balance (only for normal users)
-            if (user.role === "user") {
-              user.balance += bet.amount * ODDS;
+            if (user && user.role === "user") {
+              const payout = bet.amount * bet.odds;
+              user.balance += payout;
               if (username === currentUser?.username) currentUser.balance = user.balance;
             }
             winnersCount++;
@@ -391,12 +463,13 @@
             bet.win = false;
             losersCount++;
           }
+          betsSettled++;
         }
       });
     }
 
-    document.getElementById(`admin-result-${matchId}`).style.color = "#4fffa0";
-    document.getElementById(`admin-result-${matchId}`).textContent = `Settled ${betsSettled} bets: ${winnersCount} winners, ${losersCount} losers.`;
+    document.getElementById(`admin-result-${matchId}`).textContent =
+      `Settled ${betsSettled} bets: ${winnersCount} winners, ${losersCount} losers.`;
 
     renderAccountStatement();
 
@@ -404,6 +477,8 @@
       updateBalance();
       renderUserBets();
     }
+
+    saveData();
   }
 
   function renderAccountStatement() {
@@ -466,7 +541,7 @@
     container.innerHTML = html;
   }
 
-  // Auto-refresh every 10 seconds to update match timers and bets
+  // --- AUTO REFRESH ---
   setInterval(() => {
     if (!currentUser) return;
     if (currentUser.role === "user") {
@@ -480,6 +555,23 @@
     }
   }, 10000);
 
+  // --- ON LOAD ---
+  loadData();
+
+  if(currentUser){
+    document.getElementById("loginContainer").style.display = "none";
+    if(currentUser.role === "admin"){
+      document.getElementById("adminPanel").style.display = "block";
+      renderAdminMatches();
+      renderAccountStatement();
+    } else {
+      document.getElementById("userPanel").style.display = "block";
+      updateBalance();
+      renderMatches();
+      renderUserBets();
+      document.getElementById("userNameDisplay").textContent = currentUser.username;
+    }
+  }
 </script>
 
 </body>
