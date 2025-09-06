@@ -60,9 +60,11 @@
       margin-top: 10px;
       display: flex;
       gap: 10px;
+      flex-direction: column;
     }
-    .bet-btn button {
-      flex: 1;
+    .bet-btn input {
+      margin-top: 0;
+      margin-bottom: 10px;
     }
     .balance {
       font-size: 18px;
@@ -92,19 +94,21 @@
 
   <div class="match">
     <h3>India vs Pakistan</h3>
-    <p>Toss Winner?</p>
+    <p>Who will win the toss?</p>
     <div class="bet-btn">
-      <button onclick="placeBet('India')">India @1.85</button>
-      <button onclick="placeBet('Pakistan')">Pakistan @2.10</button>
+      <input type="number" id="betAmount1" placeholder="Enter bet amount (₹100-₹300)">
+      <button onclick="placeBet('India', 'betAmount1')">India @1.85</button>
+      <button onclick="placeBet('Pakistan', 'betAmount1')">Pakistan @2.10</button>
     </div>
   </div>
 
   <div class="match">
     <h3>Australia vs England</h3>
-    <p>Toss Winner?</p>
+    <p>Who will win the toss?</p>
     <div class="bet-btn">
-      <button onclick="placeBet('Australia')">Australia @1.90</button>
-      <button onclick="placeBet('England')">England @2.00</button>
+      <input type="number" id="betAmount2" placeholder="Enter bet amount (₹100-₹300)">
+      <button onclick="placeBet('Australia', 'betAmount2')">Australia @1.90</button>
+      <button onclick="placeBet('England', 'betAmount2')">England @2.00</button>
     </div>
   </div>
 
@@ -112,7 +116,7 @@
 </div>
 
 <script>
-  // Simulated user database (admin manually adds users here)
+  // Simulated user database
   const users = [
     { username: "user1", password: "pass1", balance: 500 },
     { username: "user2", password: "pass2", balance: 1000 },
@@ -138,14 +142,30 @@
     }
   }
 
-  function placeBet(team) {
-    const betAmount = 100; // fixed bet for demo
+  function placeBet(team, inputId) {
+    const betAmount = parseInt(document.getElementById(inputId).value);
+    if (isNaN(betAmount)) {
+      alert("Please enter a valid bet amount.");
+      return;
+    }
+
+    if (betAmount < 100) {
+      alert("Minimum bet amount is ₹100.");
+      return;
+    }
+
+    if (betAmount > 300) {
+      alert("Maximum bet amount is ₹300.");
+      return;
+    }
+
     if (currentUser.balance >= betAmount) {
       currentUser.balance -= betAmount;
-      alert(`Bet placed on ${team} for ₹${betAmount}`);
+      alert(`Bet of ₹${betAmount} placed on ${team}`);
       document.getElementById("userBalance").textContent = currentUser.balance.toFixed(2);
+      document.getElementById(inputId).value = ""; // Clear the input field
     } else {
-      alert("Insufficient balance to place bet.");
+      alert("Insufficient balance to place this bet.");
     }
   }
 
