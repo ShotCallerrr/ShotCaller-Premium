@@ -157,18 +157,18 @@
 
   // --- MATCHES ---
   const matches = [
-    { id: "eng-sa", teams: ["England", "South Africa"], tossTime: new Date(Date.now() + 20 * 60000) },
-    { id: "zim-sl", teams: ["Zimbabwe", "Sri Lanka"], tossTime: new Date(Date.now() + 40 * 60000) },
-    { id: "pak-afg", teams: ["Pakistan", "Afghanistan"], tossTime: new Date(Date.now() + 60 * 60000) }
+    { id: "Tawang-Knights", teams: ["Tawan Titans", "Kamle knights"], tossTime: new Date(Date.now() + 20 * 60000) },
+    { id: "Kurung-Siang", teams: ["Kurung Blasters", "Siang storm"], tossTime: new Date(Date.now() + 40 * 60000) },
+    { id: "afg-HongKong", teams: ["HongKong", "Afghanistan"], tossTime: new Date(Date.now() + 60 * 60000) }
   ];
 
-  const ODDS = 1.9;
+  const ODDS = 1.97;
 
   // Store all bets: { username: [ { matchId, team, amount, odds, settled, win, placedAt } ] }
   let allBets = {};
 
   const MIN_BET = 10;
-  const MAX_BET = 200;
+  const MAX_BET = 100;
 
   // --- LOCAL STORAGE FUNCTIONS ---
   function saveData() {
