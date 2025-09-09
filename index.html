@@ -1,570 +1,120 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>ShotCaller Toss Exchange</title>
-<style>
-  body {
-    font-family: Arial, sans-serif;
-    background: #0b1a2e;
-    color: #fff;
-    margin: 0; padding: 0;
-  }
-  header {
-    background: #1f2e45;
-    padding: 20px;
-    text-align: center;
-    font-size: 26px;
-    font-weight: bold;
-    color: #ffa500;
-  }
-  .container {
-    max-width: 700px;
-    margin: 30px auto;
-    background: #162b40;
-    padding: 25px;
-    border-radius: 10px;
-  }
-  input, button, select {
-    padding: 10px;
-    margin-top: 10px;
-    font-size: 16px;
-    border: none;
-    border-radius: 5px;
-    display: block;
-    width: 100%;
-  }
-  input[type="number"], input[type="text"], input[type="password"], select {
-    background: #fff;
-    color: #000;
-  }
-  button {
-    background: #ffa500;
-    color: #000;
-    cursor: pointer;
-  }
-  .match {
-    background: #203a5c;
-    padding: 15px;
-    margin-top: 25px;
-    border-radius: 8px;
-  }
-  .match h3 {
-    color: #ffa500;
-    margin: 0 0 8px 0;
-  }
-  .bet-btns {
-    display: flex;
-    gap: 10px;
-    margin-top: 10px;
-  }
-  .bet-btns button {
-    flex: 1;
-    font-weight: bold;
-  }
-  .disabled {
-    background: #555 !important;
-    cursor: not-allowed;
-  }
-  .balance {
-    color: #4fffa0;
-    font-size: 18px;
-    margin-top: 10px;
-    font-weight: bold;
-  }
-  .logout {
-    background: #ff4d4d;
-    margin-top: 25px;
-  }
-  .result {
-    margin-top: 10px;
-    font-weight: bold;
-    min-height: 20px;
-  }
-  label {
-    margin-top: 15px;
-    display: block;
-    font-weight: bold;
-  }
-  #adminPanel, #userPanel {
-    display: none;
-  }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-    color: #fff;
-  }
-  th, td {
-    border: 1px solid #555;
-    padding: 8px;
-    text-align: center;
-  }
-  th {
-    background: #ffa500;
-    color: #000;
-  }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>I'm Sorry ❤️</title>
+
+  <!-- CSS Styling -->
+  <style>
+    /* Reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* Body Background */
+    body {
+      font-family: "Poppins", sans-serif;
+      background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      text-align: center;
+    }
+
+    /* Main Card */
+    .card {
+      background: #fff;
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      max-width: 500px;
+      animation: pop 1s ease;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Heading */
+    h1 {
+      color: #e63946;
+      font-size: 2.5rem;
+      margin-bottom: 15px;
+    }
+
+    /* Message */
+    p {
+      font-size: 1.2rem;
+      color: #444;
+      margin-bottom: 10px;
+      line-height: 1.6;
+    }
+
+    /* Heart Animation */
+    .heart {
+      font-size: 2.5rem;
+      color: #e63946;
+      animation: beat 1s infinite;
+    }
+
+    @keyframes beat {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.3); }
+    }
+
+    /* Pop Animation */
+    @keyframes pop {
+      0% { transform: scale(0); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    /* Floating Hearts */
+    .floating-heart {
+      position: absolute;
+      font-size: 2rem;
+      animation: float 6s linear infinite;
+      color: #ff4d6d;
+      opacity: 0.7;
+      z-index: 1;
+    }
+
+    @keyframes float {
+      0% { transform: translateY(100vh) scale(0.5); opacity: 0; }
+      50% { opacity: 1; }
+      100% { transform: translateY(-100vh) scale(1); opacity: 0; }
+    }
+  </style>
 </head>
 <body>
+  <!-- Card Content -->
+  <div class="card">
+    <h1>I'm Really Sorry ❤️</h1>
+    <p>I know I made a mistake, and I promise I will never do that again.</p>
+    <p>Please forgive me… because without your smile, my world is incomplete.</p>
+    <div class="heart">💖</div>
+  </div>
 
-<header>ShotCaller Toss Exchange</header>
+  <!-- JavaScript for Floating Hearts -->
+  <script>
+    function createHeart() {
+      const heart = document.createElement("div");
+      heart.classList.add("floating-heart");
+      heart.innerHTML = "💖";
+      heart.style.left = Math.random() * 100 + "vw";
+      heart.style.animationDuration = (Math.random() * 4 + 4) + "s";
+      document.body.appendChild(heart);
 
-<div class="container" id="loginContainer">
-  <h2>Login</h2>
-  <label for="username">Username:</label>
-  <input type="text" id="username" placeholder="Username" autocomplete="off" />
-  <label for="password">Password:</label>
-  <input type="password" id="password" placeholder="Password" autocomplete="off" />
-  <button onclick="login()">Login</button>
-
-
-<!-- USER PANEL -->
-<div class="container" id="userPanel">
-  <h2>Welcome, <span id="userNameDisplay"></span></h2>
-  <div class="balance">Balance: ₹<span id="userBalance"></span></div>
-
-  <div id="matchesContainer"></div>
-
-  <h3>Your Active Bets:</h3>
-  <div id="userBetsList">No active bets placed.</div>
-
-  <button class="logout" onclick="logout()">Logout</button>
-</div>
-
-<!-- ADMIN PANEL -->
-<div class="container" id="adminPanel">
-  <h2>Admin Panel</h2>
-  <button class="logout" onclick="logout()">Logout</button>
-
-  <h3>Set Toss Results & Settle Bets</h3>
-  <div id="adminMatches"></div>
-
-  <h3>All User Bets (Account Statement)</h3>
-  <div id="accountStatement">No bets yet.</div>
-</div>
-
-<script>
-  // --- USERS ---
-  let users = [
-    { username: "user1", password: "pass1", balance: 1000, role: "user" },
-    { username: "demo", password: "demo", balance: 500, role: "user" },
-    { username: "admin", password: "admin123", role: "admin" }
-  ];
-
-  let currentUser = null;
-
-  // --- MATCHES ---
-  const matches = [
-    { id: "Tawang-Knights", teams: ["Tawan Titans", "Kamle knights"], tossTime: new Date(Date.now() + 20 * 60000) },
-    { id: "Kurung-Siang", teams: ["Kurung Blasters", "Siang storm"], tossTime: new Date(Date.now() + 40 * 60000) },
-    { id: "afg-HongKong", teams: ["HongKong", "Afghanistan"], tossTime: new Date(Date.now() + 60 * 60000) }
-  ];
-
-  const ODDS = 1.97;
-
-  // Store all bets: { username: [ { matchId, team, amount, odds, settled, win, placedAt } ] }
-  let allBets = {};
-
-  const MIN_BET = 10;
-  const MAX_BET = 100;
-
-  // --- LOCAL STORAGE FUNCTIONS ---
-  function saveData() {
-    localStorage.setItem('shotcaller_users', JSON.stringify(users));
-    localStorage.setItem('shotcaller_bets', JSON.stringify(allBets));
-    localStorage.setItem('shotcaller_currentUser', JSON.stringify(currentUser));
-  }
-
-  function loadData() {
-    const savedUsers = localStorage.getItem('shotcaller_users');
-    const savedBets = localStorage.getItem('shotcaller_bets');
-    const savedCurrentUser = localStorage.getItem('shotcaller_currentUser');
-
-    if (savedUsers) {
-      const parsedUsers = JSON.parse(savedUsers);
-      // Merge balances and roles but keep passwords from initial
-      parsedUsers.forEach(savedUser => {
-        const userIndex = users.findIndex(u => u.username === savedUser.username);
-        if (userIndex !== -1) {
-          users[userIndex].balance = savedUser.balance;
-          users[userIndex].role = savedUser.role;
-        } else {
-          // New user from storage? Add them
-          users.push(savedUser);
-        }
-      });
+      // Remove after animation
+      setTimeout(() => {
+        heart.remove();
+      }, 6000);
     }
 
-    if (savedBets) {
-      allBets = JSON.parse(savedBets);
-    }
-
-    if (savedCurrentUser) {
-      currentUser = JSON.parse(savedCurrentUser);
-      if (currentUser) {
-        // Refresh balance from users array for safety
-        const usr = users.find(u => u.username === currentUser.username);
-        if (usr) currentUser.balance = usr.balance;
-      }
-    }
-  }
-
-  // --- LOGIN ---
-  function login() {
-    const username = document.getElementById("username").value.trim();
-    const password = document.getElementById("password").value.trim();
-
-    const user = users.find(u => u.username === username && u.password === password);
-    if (!user) {
-      alert("Invalid username or password");
-      return;
-    }
-
-    currentUser = {...user};
-    if (!allBets[currentUser.username]) allBets[currentUser.username] = [];
-
-    document.getElementById("loginContainer").style.display = "none";
-
-    if (currentUser.role === "admin") {
-      document.getElementById("adminPanel").style.display = "block";
-      renderAdminMatches();
-      renderAccountStatement();
-    } else {
-      document.getElementById("userPanel").style.display = "block";
-      updateBalance();
-      renderMatches();
-      renderUserBets();
-      document.getElementById("userNameDisplay").textContent = currentUser.username;
-    }
-
-    saveData();
-  }
-
-  // --- LOGOUT ---
-  function logout() {
-    currentUser = null;
-    document.getElementById("loginContainer").style.display = "block";
-    document.getElementById("userPanel").style.display = "none";
-    document.getElementById("adminPanel").style.display = "none";
-
-    document.getElementById("username").value = "";
-    document.getElementById("password").value = "";
-
-    saveData();
-  }
-
-  // --- USER FUNCTIONS ---
-  function updateBalance() {
-    document.getElementById("userBalance").textContent = currentUser.balance.toFixed(2);
-  }
-
-  function renderMatches() {
-    const container = document.getElementById("matchesContainer");
-    container.innerHTML = "";
-
-    const now = new Date();
-
-    matches.forEach(match => {
-      const timeLeftMins = Math.floor((match.tossTime - now) / 60000);
-      const isOpen = now < match.tossTime;
-
-      const div = document.createElement("div");
-      div.className = "match";
-      div.innerHTML = `
-        <h3>${match.teams[0]} vs ${match.teams[1]} - Toss</h3>
-        <div>${isOpen ? `Toss betting open - ${timeLeftMins} min left` : `<span style="color:#ff4d4d;">Toss betting closed</span>`}</div>
-        <label for="amount-${match.id}">Bet Amount (₹${MIN_BET}–₹${MAX_BET}):</label>
-        <input type="number" id="amount-${match.id}" min="${MIN_BET}" max="${MAX_BET}" placeholder="Enter bet amount" ${!isOpen ? "disabled" : ""} />
-        <div class="bet-btns">
-          <button id="btn-${match.id}-1" ${!isOpen ? "disabled class='disabled'" : ""} onclick="placeBet('${match.id}', '${match.teams[0]}')">${match.teams[0]} @1.90</button>
-          <button id="btn-${match.id}-2" ${!isOpen ? "disabled class='disabled'" : ""} onclick="placeBet('${match.id}', '${match.teams[1]}')">${match.teams[1]} @1.90</button>
-        </div>
-        <div class="result" id="result-${match.id}"></div>
-      `;
-      container.appendChild(div);
-    });
-  }
-
-  function placeBet(matchId, team) {
-    if (!currentUser) {
-      alert("Please login first.");
-      return;
-    }
-
-    const now = new Date();
-    const match = matches.find(m => m.id === matchId);
-    if (!match) return;
-
-    if (now >= match.tossTime) {
-      alert("Toss betting closed for this match.");
-      return;
-    }
-
-    const input = document.getElementById(`amount-${matchId}`);
-    const amount = parseFloat(input.value);
-    if (isNaN(amount)) {
-      alert("Please enter a valid bet amount.");
-      return;
-    }
-    if (amount < MIN_BET || amount > MAX_BET) {
-      alert(`Bet amount must be between ₹${MIN_BET} and ₹${MAX_BET}.`);
-      return;
-    }
-    if (amount > currentUser.balance) {
-      alert("Insufficient balance.");
-      return;
-    }
-
-    // Deduct balance immediately
-    currentUser.balance -= amount;
-
-    // Update global user list balance for persistence
-    const userInList = users.find(u => u.username === currentUser.username);
-    if (userInList) userInList.balance = currentUser.balance;
-
-    // Store bet
-    if (!allBets[currentUser.username]) allBets[currentUser.username] = [];
-    allBets[currentUser.username].push({
-      matchId,
-      team,
-      amount,
-      odds: ODDS,
-      settled: false,
-      win: null,
-      placedAt: new Date().toISOString()
-    });
-
-    input.value = "";
-
-    updateBalance();
-    renderUserBets();
-
-    alert(`Bet placed: ₹${amount} on ${team} toss @1.90`);
-
-    saveData();
-  }
-
-  function renderUserBets() {
-    const container = document.getElementById("userBetsList");
-    if (!allBets[currentUser.username] || allBets[currentUser.username].length === 0) {
-      container.textContent = "No active bets placed.";
-      return;
-    }
-
-    const bets = allBets[currentUser.username].slice().reverse(); // latest first
-
-    let html = "<table><thead><tr><th>Match</th><th>Bet On</th><th>Amount (₹)</th><th>Odds</th><th>Status</th></tr></thead><tbody>";
-
-    bets.forEach(bet => {
-      const match = matches.find(m => m.id === bet.matchId);
-      const matchName = match ? `${match.teams[0]} vs ${match.teams[1]}` : bet.matchId;
-
-      let status = "Pending";
-      if (bet.settled) {
-        status = bet.win ? "<span style='color:#4fffa0;'>Won</span>" : "<span style='color:#ff4d4d;'>Lost</span>";
-      } else {
-        const now = new Date();
-        if (now >= match.tossTime) status = "Awaiting result";
-      }
-
-      html += `<tr>
-        <td>${matchName}</td>
-        <td>${bet.team}</td>
-        <td>${bet.amount.toFixed(2)}</td>
-        <td>${bet.odds.toFixed(2)}</td>
-        <td>${status}</td>
-      </tr>`;
-    });
-
-    html += "</tbody></table>";
-    container.innerHTML = html;
-  }
-
-  // --- ADMIN FUNCTIONS ---
-  function renderAdminMatches() {
-    const container = document.getElementById("adminMatches");
-    container.innerHTML = "";
-
-    const now = new Date();
-
-    matches.forEach(match => {
-      const matchBets = [];
-      for (const username in allBets) {
-        allBets[username].forEach(bet => {
-          if (bet.matchId === match.id && !bet.settled) {
-            matchBets.push({ username, bet });
-          }
-        });
-      }
-
-      const div = document.createElement("div");
-      div.className = "match";
-
-      let settledResult = "Not settled";
-      const anySettled = matchBets.some(({bet}) => bet.settled === true);
-      if (anySettled) {
-        const wonBet = matchBets.find(({bet}) => bet.settled && bet.win);
-        if (wonBet) settledResult = `Toss won by ${wonBet.bet.team}`;
-      }
-
-      div.innerHTML = `
-        <h3>${match.teams[0]} vs ${match.teams[1]}</h3>
-        <div><strong>Toss Time:</strong> ${match.tossTime.toLocaleString()}</div>
-        <div><strong>Current result:</strong> ${settledResult}</div>
-        <label>Set toss winner:</label>
-        <select id="tossWinner-${match.id}">
-          <option value="">Select winner</option>
-          <option value="${match.teams[0]}">${match.teams[0]}</option>
-          <option value="${match.teams[1]}">${match.teams[1]}</option>
-        </select>
-        <button onclick="settleBets('${match.id}')">Settle Bets</button>
-        <div id="admin-result-${match.id}" class="result"></div>
-      `;
-      container.appendChild(div);
-    });
-  }
-
-  function settleBets(matchId) {
-    const winnerSelect = document.getElementById(`tossWinner-${matchId}`);
-    const winner = winnerSelect.value;
-    if (!winner) {
-      alert("Please select the toss winner.");
-      return;
-    }
-
-    let betsSettled = 0;
-    let winnersCount = 0;
-    let losersCount = 0;
-
-    for (const username in allBets) {
-      const user = users.find(u => u.username === username);
-      allBets[username].forEach(bet => {
-        if (bet.matchId === matchId && !bet.settled) {
-          bet.settled = true;
-          if (bet.team === winner) {
-            bet.win = true;
-            if (user && user.role === "user") {
-              const payout = bet.amount * bet.odds;
-              user.balance += payout;
-              if (username === currentUser?.username) currentUser.balance = user.balance;
-            }
-            winnersCount++;
-          } else {
-            bet.win = false;
-            losersCount++;
-          }
-          betsSettled++;
-        }
-      });
-    }
-
-    document.getElementById(`admin-result-${matchId}`).textContent =
-      `Settled ${betsSettled} bets: ${winnersCount} winners, ${losersCount} losers.`;
-
-    renderAccountStatement();
-
-    if (currentUser?.role === "user") {
-      updateBalance();
-      renderUserBets();
-    }
-
-    saveData();
-  }
-
-  function renderAccountStatement() {
-    const container = document.getElementById("accountStatement");
-    container.innerHTML = "";
-
-    const all = [];
-    for (const username in allBets) {
-      allBets[username].forEach(bet => {
-        all.push({
-          username,
-          ...bet
-        });
-      });
-    }
-
-    if (all.length === 0) {
-      container.textContent = "No bets placed yet.";
-      return;
-    }
-
-    all.sort((a,b) => new Date(b.placedAt) - new Date(a.placedAt));
-
-    let html = `<table>
-      <thead>
-        <tr>
-          <th>User</th>
-          <th>Match</th>
-          <th>Bet Team</th>
-          <th>Amount (₹)</th>
-          <th>Odds</th>
-          <th>Settled</th>
-          <th>Result</th>
-          <th>Placed At</th>
-        </tr>
-      </thead>
-      <tbody>`;
-
-    all.forEach(bet => {
-      const match = matches.find(m => m.id === bet.matchId);
-      const matchName = match ? `${match.teams[0]} vs ${match.teams[1]}` : bet.matchId;
-      let resultText = bet.settled ? (bet.win ? "Won" : "Lost") : "Pending";
-      let color = bet.settled ? (bet.win ? "#4fffa0" : "#ff5555") : "#fff";
-
-      html += `
-      <tr>
-        <td>${bet.username}</td>
-        <td>${matchName}</td>
-        <td>${bet.team}</td>
-        <td>${bet.amount.toFixed(2)}</td>
-        <td>${bet.odds.toFixed(2)}</td>
-        <td>${bet.settled ? "Yes" : "No"}</td>
-        <td style="color:${color};">${resultText}</td>
-        <td>${new Date(bet.placedAt).toLocaleString()}</td>
-      </tr>`;
-    });
-
-    html += `</tbody></table>`;
-
-    container.innerHTML = html;
-  }
-
-  // --- AUTO REFRESH ---
-  setInterval(() => {
-    if (!currentUser) return;
-    if (currentUser.role === "user") {
-      renderMatches();
-      renderUserBets();
-      updateBalance();
-    }
-    if (currentUser.role === "admin") {
-      renderAdminMatches();
-      renderAccountStatement();
-    }
-  }, 10000);
-
-  // --- ON LOAD ---
-  loadData();
-
-  if(currentUser){
-    document.getElementById("loginContainer").style.display = "none";
-    if(currentUser.role === "admin"){
-      document.getElementById("adminPanel").style.display = "block";
-      renderAdminMatches();
-      renderAccountStatement();
-    } else {
-      document.getElementById("userPanel").style.display = "block";
-      updateBalance();
-      renderMatches();
-      renderUserBets();
-      document.getElementById("userNameDisplay").textContent = currentUser.username;
-    }
-  }
-</script>
-
+    // Create hearts at intervals
+    setInterval(createHeart, 600);
+  </script>
 </body>
 </html>
