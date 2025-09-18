@@ -1,120 +1,497 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>I'm Sorry ❤️</title>
-
-  <!-- CSS Styling -->
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>AI Crop Yield — Prototype</title>
   <style>
-    /* Reset */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+    :root{
+      --accent:#2b8aef;
+      --muted:#666;
+      --card:#fff;
+      --bg:#f4f7fb;
+      --glass: rgba(255,255,255,0.7);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
     }
+    html,body{height:100%;margin:0;background:var(--bg);}
+    .container{max-width:1100px;margin:28px auto;padding:20px}
+    header{display:flex;align-items:center;justify-content:space-between}
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{width:46px;height:46px;background:linear-gradient(135deg,var(--accent),#66b2ff);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700}
+    h1{margin:0;font-size:18px}
+    .card{background:var(--card);border-radius:10px;padding:18px;box-shadow:0 6px 18px rgba(20,30,50,0.06);}
 
-    /* Body Background */
-    body {
-      font-family: "Poppins", sans-serif;
-      background: linear-gradient(135deg, #ff9a9e, #fad0c4);
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      overflow: hidden;
-      text-align: center;
-    }
+    /* Layout */
+    .grid{display:grid;grid-template-columns:280px 1fr;gap:18px;margin-top:18px}
+    nav{min-height:400px}
+    nav .menu{display:flex;flex-direction:column;gap:8px}
+    .menu button{background:none;border:0;padding:10px;border-radius:8px;text-align:left;cursor:pointer}
+    .menu button.active{background:linear-gradient(90deg,rgba(43,138,239,0.12),rgba(102,178,255,0.08));}
 
-    /* Main Card */
-    .card {
-      background: #fff;
-      padding: 40px;
-      border-radius: 20px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-      max-width: 500px;
-      animation: pop 1s ease;
-      position: relative;
-      z-index: 2;
-    }
+    .login-wrap{max-width:420px;margin:40px auto}
+    .form-row{margin-bottom:12px}
+    label{display:block;margin-bottom:6px;color:var(--muted);font-size:13px}
+    input,select,textarea{width:100%;padding:10px;border-radius:8px;border:1px solid #e3e6ef;background:#fff;font-size:14px}
+    .btn{background:var(--accent);color:#fff;padding:10px 14px;border-radius:8px;border:0;cursor:pointer}
+    .btn.ghost{background:transparent;color:var(--accent);border:1px solid rgba(43,138,239,0.18)}
 
-    /* Heading */
-    h1 {
-      color: #e63946;
-      font-size: 2.5rem;
-      margin-bottom: 15px;
-    }
+    .small{font-size:13px;color:var(--muted)}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:8px;border-bottom:1px solid #f0f2f6;text-align:left}
 
-    /* Message */
-    p {
-      font-size: 1.2rem;
-      color: #444;
-      margin-bottom: 10px;
-      line-height: 1.6;
-    }
+    .kpi{display:flex;gap:12px}
+    .kpi .item{flex:1;padding:12px;border-radius:8px;background:linear-gradient(0deg,rgba(255,255,255,0.9),rgba(255,255,255,0.9));box-shadow:0 4px 12px rgba(20,30,50,0.04)}
 
-    /* Heart Animation */
-    .heart {
-      font-size: 2.5rem;
-      color: #e63946;
-      animation: beat 1s infinite;
-    }
+    .note{font-size:13px;color:#444;margin-top:8px}
 
-    @keyframes beat {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.3); }
-    }
+    footer{margin-top:28px;text-align:center;color:var(--muted);font-size:13px}
 
-    /* Pop Animation */
-    @keyframes pop {
-      0% { transform: scale(0); opacity: 0; }
-      100% { transform: scale(1); opacity: 1; }
-    }
-
-    /* Floating Hearts */
-    .floating-heart {
-      position: absolute;
-      font-size: 2rem;
-      animation: float 6s linear infinite;
-      color: #ff4d6d;
-      opacity: 0.7;
-      z-index: 1;
-    }
-
-    @keyframes float {
-      0% { transform: translateY(100vh) scale(0.5); opacity: 0; }
-      50% { opacity: 1; }
-      100% { transform: translateY(-100vh) scale(1); opacity: 0; }
-    }
+    /* Responsive */
+    @media(max-width:880px){.grid{grid-template-columns:1fr;}.logo{display:none}}
   </style>
 </head>
 <body>
-  <!-- Card Content -->
-  <div class="card">
-    <h1>I'm Really Sorry ❤️</h1>
-    <p>I know I made a mistake, and I promise I will never do that again.</p>
-    <p>Please forgive me… because without your smile, my world is incomplete.</p>
-    <div class="heart">💖</div>
+  <div class="container">
+    <header>
+      <div class="brand">
+        <div class="logo">AI</div>
+        <div>
+          <h1>AI Crop Yield — Prototype</h1>
+          <div class="small">Prediction + Recommendations — demo only</div>
+        </div>
+      </div>
+      <div id="userActions"></div>
+    </header>
+
+    <div id="app">
+      <!-- Login / Register views shown when not authenticated -->
+      <div id="authView" class="login-wrap card" style="display:none">
+        <h2 id="authTitle">Sign in</h2>
+        <div class="form-row">
+          <label for="email">Email / Phone</label>
+          <input id="email" placeholder="you@example.com or +91XXXXXXXXXX">
+        </div>
+        <div class="form-row">
+          <label for="password">Password</label>
+          <input id="password" type="password" placeholder="choose a password">
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn" id="authBtn">Sign in</button>
+          <button class="btn ghost" id="toggleAuth">Create account</button>
+        </div>
+        <div class="note">This prototype stores user data locally in your browser (localStorage). Replace with a secure backend for production.</div>
+      </div>
+
+      <!-- Main app when logged in -->
+      <div id="mainView" style="display:none">
+        <div class="grid">
+          <nav>
+            <div class="card">
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+                <img src="" alt="" style="width:46px;height:46px;border-radius:6px;background:#eef;" id="avatar">
+                <div>
+                  <div id="welcomeName" style="font-weight:600"></div>
+                  <div class="small" id="welcomeRole">Farmer</div>
+                </div>
+              </div>
+              <div class="menu">
+                <button class="active" data-view="dashboard">Dashboard</button>
+                <button data-view="fields">Fields</button>
+                <button data-view="predict">Predict Yield</button>
+                <button data-view="recommend">Recommendations</button>
+                <button data-view="settings">Settings</button>
+                <button id="logoutBtn" style="margin-top:10px" class="btn ghost">Logout</button>
+              </div>
+            </div>
+            <div style="margin-top:12px;font-size:13px;color:var(--muted)" class="card">
+              <strong>Prototype notes</strong>
+              <p class="small">This is a client-side prototype. Replace mock predict() and localStorage with your model API endpoints for production.</p>
+            </div>
+          </nav>
+
+          <main>
+            <section id="dashboard" class="card view">
+              <h3>Dashboard</h3>
+              <div class="kpi" style="margin-top:12px">
+                <div class="item">
+                  <div class="small">Predicted avg yield</div>
+                  <div style="font-size:22px;font-weight:700" id="kpiYield">-- kg/ha</div>
+                </div>
+                <div class="item">
+                  <div class="small">Avg soil health (index)</div>
+                  <div style="font-size:22px;font-weight:700" id="kpiSoil">--</div>
+                </div>
+                <div class="item">
+                  <div class="small">Actionable recommendations</div>
+                  <div style="font-size:22px;font-weight:700" id="kpiRecs">--</div>
+                </div>
+              </div>
+
+              <div style="margin-top:16px">
+                <h4>Your fields</h4>
+                <table id="fieldsTable"><thead><tr><th>Name</th><th>Crop</th><th>Area (ha)</th><th>Last yield</th><th>Actions</th></tr></thead><tbody></tbody></table>
+                <div style="margin-top:10px">
+                  <button class="btn" id="addFieldBtn">Add field</button>
+                </div>
+              </div>
+            </section>
+
+            <section id="fields" class="card view" style="display:none">
+              <h3>Fields</h3>
+              <div id="fieldFormWrap"></div>
+            </section>
+
+            <section id="predict" class="card view" style="display:none">
+              <h3>Predict yield for a field</h3>
+              <div class="form-row">
+                <label>Choose field</label>
+                <select id="selectField"></select>
+              </div>
+              <div class="form-row">
+                <label>Crop</label>
+                <input id="predictCrop" placeholder="e.g., Maize">
+              </div>
+              <div class="form-row">
+                <label>Sowing date</label>
+                <input id="sowingDate" type="date">
+              </div>
+              <div class="form-row">
+                <label>Soil index (0-100)</label>
+                <input id="soilIndex" type="number" min="0" max="100">
+              </div>
+              <div style="display:flex;gap:8px">
+                <button class="btn" id="runPredict">Run prediction</button>
+                <button class="btn ghost" id="mockWeather">Fill mock weather</button>
+              </div>
+
+              <div id="predictResult" style="margin-top:12px;display:none">
+                <h4>Prediction</h4>
+                <div class="small">Predicted Yield (kg/ha): <strong id="predYield"></strong></div>
+                <div class="small">Confidence interval: <span id="predCI"></span></div>
+                <div style="margin-top:8px"><strong>Top drivers</strong>
+                  <ul id="topDrivers"></ul>
+                </div>
+              </div>
+            </section>
+
+            <section id="recommend" class="card view" style="display:none">
+              <h3>Recommendations</h3>
+              <div id="recsList"></div>
+            </section>
+
+            <section id="settings" class="card view" style="display:none">
+              <h3>Settings</h3>
+              <div class="form-row">
+                <label>Display name</label>
+                <input id="displayName">
+              </div>
+              <div class="form-row">
+                <label>Language</label>
+                <select id="langSelect"><option value="en">English</option><option value="hi">Hindi</option></select>
+              </div>
+              <div style="display:flex;gap:8px"><button class="btn" id="saveSettings">Save</button></div>
+            </section>
+          </main>
+        </div>
+
+        <footer>Prototype — replace localStorage auth & mock prediction with secure backend and ML API for production.</footer>
+      </div>
+    </div>
   </div>
 
-  <!-- JavaScript for Floating Hearts -->
   <script>
-    function createHeart() {
-      const heart = document.createElement("div");
-      heart.classList.add("floating-heart");
-      heart.innerHTML = "💖";
-      heart.style.left = Math.random() * 100 + "vw";
-      heart.style.animationDuration = (Math.random() * 4 + 4) + "s";
-      document.body.appendChild(heart);
+    /******************************************************************
+     * Simple client-side prototype
+     * - Auth (localStorage)
+     * - Field CRUD (localStorage)
+     * - Mock predict() function that simulates ML + returns drivers
+     * - Recommendation engine (rule-based) that uses prediction + soil
+     * NOTE: This is only a frontend prototype — do not use for production.
+     ******************************************************************/
 
-      // Remove after animation
-      setTimeout(() => {
-        heart.remove();
-      }, 6000);
+    // --- Utilities
+    const $ = (id)=>document.getElementById(id);
+    const qs = (sel, ctx=document)=>ctx.querySelector(sel);
+
+    // --- Local storage keys
+    const LS_USER = 'acrop_user';
+    const LS_USERS = 'acrop_users';
+    const LS_FIELDS = 'acrop_fields';
+
+    // --- Simple auth functions (local only)
+    function saveUserToStorage(user){
+      const list = JSON.parse(localStorage.getItem(LS_USERS)||'[]');
+      const foundIndex = list.findIndex(u=>u.email===user.email);
+      if(foundIndex>=0) list[foundIndex]=user; else list.push(user);
+      localStorage.setItem(LS_USERS, JSON.stringify(list));
+      localStorage.setItem(LS_USER, JSON.stringify(user));
+    }
+    function getCurrentUser(){
+      return JSON.parse(localStorage.getItem(LS_USER)||'null');
+    }
+    function logout(){
+      localStorage.removeItem(LS_USER);
+      renderApp();
+    }
+    function register(email, password){
+      const list = JSON.parse(localStorage.getItem(LS_USERS)||'[]');
+      if(list.find(u=>u.email===email)) throw new Error('User already exists');
+      const user = {email, password, name: email.split('@')[0]};
+      saveUserToStorage(user);
+      return user;
+    }
+    function login(email, password){
+      const list = JSON.parse(localStorage.getItem(LS_USERS)||'[]');
+      const found = list.find(u=>u.email===email && u.password===password);
+      if(!found) throw new Error('Invalid credentials');
+      localStorage.setItem(LS_USER, JSON.stringify(found));
+      return found;
     }
 
-    // Create hearts at intervals
-    setInterval(createHeart, 600);
+    // --- Fields management
+    function getFields(){
+      return JSON.parse(localStorage.getItem(LS_FIELDS)||'[]');
+    }
+    function saveFields(f){
+      localStorage.setItem(LS_FIELDS, JSON.stringify(f));
+    }
+    function addField(field){
+      const f = getFields();
+      field.id = 'fld_'+Date.now();
+      f.push(field); saveFields(f);
+    }
+    function updateField(id, patch){
+      const f = getFields();
+      const idx = f.findIndex(x=>x.id===id); if(idx<0) return;
+      f[idx] = {...f[idx], ...patch}; saveFields(f);
+    }
+    function deleteField(id){
+      const f = getFields().filter(x=>x.id!==id); saveFields(f);
+    }
+
+    // --- Basic UI wiring
+    const authView = $('authView');
+    const mainView = $('mainView');
+    const userActions = $('userActions');
+
+    function showAuth(){authView.style.display='block'; mainView.style.display='none';}
+    function showMain(){authView.style.display='none'; mainView.style.display='block';}
+
+    function renderApp(){
+      const user = getCurrentUser();
+      if(!user){
+        // show login
+        authView.style.display='block'; mainView.style.display='none';
+        $('authTitle').innerText='Sign in';
+        $('authBtn').innerText='Sign in';
+        $('toggleAuth').innerText='Create account';
+        userActions.innerHTML='';
+        attachAuthHandlers();
+        return;
+      }
+      // show main
+      showMain();
+      $('welcomeName').innerText = user.name||user.email;
+      $('avatar').src = '';
+      renderFieldsTable();
+      renderKPIs();
+      populateSelectFields();
+      attachMainHandlers();
+      renderRecs();
+      renderUserActions(user);
+    }
+
+    function renderUserActions(user){
+      userActions.innerHTML = `<div style="display:flex;gap:8px;align-items:center"><span class="small">${user.email}</span> <button class=\"btn ghost\" id=\"quickLogout\">Logout</button></div>`;
+      $('quickLogout').onclick = ()=>logout();
+    }
+
+    // Auth handlers
+    function attachAuthHandlers(){
+      document.getElementById('authBtn').onclick = ()=>{
+        const email = $('email').value.trim(); const pw = $('password').value;
+        try{ login(email,pw); renderApp(); }catch(e){
+          // if user not found, show friendly message
+          if(e.message.includes('Invalid')){
+            if(confirm('Invalid credentials. Create new account with these credentials?')){
+              try{ register(email,pw); alert('Account created and signed in.'); renderApp(); }catch(er){alert(er.message)}
+            }
+          } else alert(e.message);
+        }
+      };
+      $('toggleAuth').onclick = ()=>{
+        if($('authBtn').innerText.includes('Sign in')){
+          $('authTitle').innerText='Create account'; $('authBtn').innerText='Create account'; $('toggleAuth').innerText='Back to sign in';
+        } else { $('authTitle').innerText='Sign in'; $('authBtn').innerText='Sign in'; $('toggleAuth').innerText='Create account'; }
+      };
+    }
+
+    // Main handlers
+    function attachMainHandlers(){
+      document.querySelectorAll('.menu button').forEach(btn=>btn.onclick = (e)=>{
+        document.querySelectorAll('.menu button').forEach(b=>b.classList.remove('active'));
+        e.currentTarget.classList.add('active');
+        const view = e.currentTarget.dataset.view;
+        document.querySelectorAll('.view').forEach(v=>v.style.display='none');
+        $(view).style.display='block';
+      });
+      $('logoutBtn').onclick = ()=>{ if(confirm('Logout?')) logout(); };
+      $('addFieldBtn').onclick = ()=>{ showAddFieldForm(); };
+      $('runPredict').onclick = runPredictHandler;
+      $('mockWeather').onclick = ()=>{ $('soilIndex').value = 55; $('predictCrop').value='Maize'; $('sowingDate').value = new Date().toISOString().slice(0,10); }
+      $('saveSettings').onclick = ()=>{ const u=getCurrentUser(); u.name=$('displayName').value; localStorage.setItem(LS_USER, JSON.stringify(u)); saveUserToStorage(u); alert('Saved'); renderApp(); };
+    }
+
+    // Fields table
+    function renderFieldsTable(){
+      const tbody = qs('#fieldsTable tbody'); tbody.innerHTML='';
+      const f = getFields();
+      if(f.length===0) tbody.innerHTML = '<tr><td colspan="5" class="small">No fields yet</td></tr>';
+      f.forEach(field=>{
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${escapeHtml(field.name)}</td><td>${escapeHtml(field.crop||'--')}</td><td>${field.area||0}</td><td>${field.last_yield||'--'}</td><td><button class=\"btn ghost\" data-id=\"${field.id}\">Edit</button> <button class=\"btn\" data-del=\"${field.id}\">Delete</button></td>`;
+        tbody.appendChild(tr);
+      });
+      tbody.querySelectorAll('button[data-id]').forEach(b=>b.onclick = (e)=>{ const id=e.currentTarget.dataset.id; showEditFieldForm(id); });
+      tbody.querySelectorAll('button[data-del]').forEach(b=>b.onclick = (e)=>{ const id=e.currentTarget.dataset.del; if(confirm('Delete field?')){ deleteField(id); renderFieldsTable(); populateSelectFields(); } });
+    }
+
+    // Field forms
+    function showAddFieldForm(){
+      const wrap = $('fieldFormWrap');
+      wrap.innerHTML = fieldFormHtml();
+      attachFieldFormHandlers();
+    }
+    function showEditFieldForm(id){
+      const f = getFields().find(x=>x.id===id); if(!f) return;
+      const wrap = $('fieldFormWrap');
+      wrap.innerHTML = fieldFormHtml(f);
+      attachFieldFormHandlers(id);
+    }
+    function fieldFormHtml(field={name:'',crop:'',area:1,last_yield:''}){
+      return `
+        <div class="card">
+          <h4>${field.id? 'Edit Field':'Add Field'}</h4>
+          <div class="form-row"><label>Field name</label><input id="f_name" value="${escapeHtml(field.name)}"></div>
+          <div class="form-row"><label>Crop</label><input id="f_crop" value="${escapeHtml(field.crop)}"></div>
+          <div class="form-row"><label>Area (ha)</label><input id="f_area" type="number" value="${field.area||1}"></div>
+          <div class="form-row"><label>Last season yield (kg/ha)</label><input id="f_last" value="${escapeHtml(field.last_yield||'')}"></div>
+          <div style="display:flex;gap:8px"><button class="btn" id="saveField">Save</button> <button class="btn ghost" id="cancelField">Cancel</button></div>
+        </div>
+      `;
+    }
+    function attachFieldFormHandlers(editId){
+      $('cancelField').onclick = ()=>{ $('fieldFormWrap').innerHTML=''; };
+      $('saveField').onclick = ()=>{
+        const name = $('f_name').value.trim(); const crop=$('f_crop').value.trim(); const area=parseFloat($('f_area').value)||0; const last = $('f_last').value.trim();
+        if(!name){ alert('Enter name'); return; }
+        if(editId) updateField(editId,{name,crop,area,last_yield:last}); else addField({name,crop,area,last_yield:last});
+        $('fieldFormWrap').innerHTML=''; renderFieldsTable(); populateSelectFields(); renderKPIs();
+      };
+    }
+
+    function populateSelectFields(){
+      const sel = $('selectField'); if(!sel) return;
+      sel.innerHTML=''; const f = getFields(); if(f.length===0) sel.innerHTML='<option value="">-- no fields --</option>';
+      f.forEach(ff=>{ const opt = document.createElement('option'); opt.value=ff.id; opt.innerText = ff.name; sel.appendChild(opt); });
+    }
+
+    function renderKPIs(){
+      const f = getFields(); if(f.length===0){ $('kpiYield').innerText='--'; $('kpiSoil').innerText='--'; $('kpiRecs').innerText='0'; return; }
+      // simple aggregation and mock prediction
+      let sumYield=0; let count=0; let soilAvg=50;
+      f.forEach(ff=>{ if(ff.last_yield) { sumYield += Number(ff.last_yield); count++; } });
+      const avgLast = count? Math.round(sumYield/count): '--';
+      $('kpiYield').innerText = avgLast==='--' ? '--' : `${avgLast} kg/ha`;
+      $('kpiSoil').innerText = soilAvg;
+      $('kpiRecs').innerText = Math.max(0, Math.floor(Math.random()*5));
+    }
+
+    // --- Mock ML prediction (simple, explainable) ---
+    // This function simulates a model: higher soilIndex and area and better last_yield produce higher prediction.
+    function mockPredict({field,soilIndex,cropDays}){
+      // baseline by crop type
+      const cropBase = {Maize:3000,Wheat:2500,Rice:3500}[field.crop] || 2800;
+      const last = Number(field.last_yield) || cropBase*0.7;
+      const soilFactor = (Number(soilIndex)||50)/100; // 0..1
+      const timeFactor = Math.max(0, Math.min(1, (cropDays||90)/120));
+      // simple formula
+      const pred = Math.round(0.5*last + 0.4*cropBase*soilFactor + 0.1*cropBase*timeFactor);
+      // confidence: narrower if we have last_yield and soil
+      const conf = (field.last_yield?0.12:0.22) * (1 - Math.abs(soilFactor-0.5));
+      // top drivers
+      const drivers = [
+        {feature:'last_yield',impact: (field.last_yield? 0.5:0.2)},
+        {feature:'soil_index',impact: soilFactor},
+        {feature:'crop_base',impact: cropBase/4000}
+      ];
+      return {pred,lower:Math.max(0,Math.round(pred*(1-conf))),upper:Math.round(pred*(1+conf)),drivers};
+    }
+
+    function runPredictHandler(){
+      const fldId = $('selectField').value; if(!fldId){ alert('Choose a field'); return; }
+      const field = getFields().find(x=>x.id===fldId);
+      const crop = $('predictCrop').value.trim() || field.crop || 'Maize';
+      const sow = $('sowingDate').value; const soilIdx = Number($('soilIndex').value)||50;
+      const cropDays = sow? Math.round((new Date()-new Date(sow))/ (1000*3600*24)) : 90;
+      field.crop = crop; updateField(field.id, {crop});
+      const result = mockPredict({field,soilIndex:soilIdx,cropDays});
+      $('predYield').innerText = result.pred + ' kg/ha';
+      $('predCI').innerText = result.lower + ' — ' + result.upper + ' kg/ha';
+      const ul = $('topDrivers'); ul.innerHTML=''; result.drivers.forEach(d=>{ const li=document.createElement('li'); li.innerText = `${d.feature} (impact ${(d.impact*100).toFixed(0)}%)`; ul.appendChild(li); });
+      $('predictResult').style.display='block';
+      renderRecommendationForField(field, result);
+    }
+
+    // Recommendation engine (simple rules)
+    function renderRecommendationForField(field, prediction){
+      const recWrap = $('recsList');
+      // basic rules
+      const recs = [];
+      const soil = Number($('soilIndex').value) || 50;
+      if(soil < 40) recs.push({type:'Fertilizer',text:`Soil index ${soil} suggests low fertility. Apply nitrogen-rich fertilizer: ~${Math.round(50 * (1 - soil/100))} kg/ha as basal.`});
+      // moisture rule: if predicted < last_yield -> water stress risk
+      if(field.last_yield && prediction.pred < Number(field.last_yield)){
+        recs.push({type:'Irrigation',text:'Predicted yield < last season. Inspect for moisture stress in critical stages; provide an irrigation cycle (e.g., 1 irrigation of 25mm).'});
+      }
+      // pest rule - random small chance
+      if(Math.random() < 0.22) recs.push({type:'Pest',text:'Weather & NDVI anomaly suggests elevated pest risk. Scout field every 3 days and apply threshold-based control.'});
+
+      if(recs.length===0) recWrap.innerHTML = '<div class="small">No urgent recommendations. Continue normal monitoring.</div>';
+      else{
+        recWrap.innerHTML = '';
+        recs.forEach(r=>{
+          const card = document.createElement('div'); card.className='card'; card.style.marginBottom='8px';
+          card.innerHTML = `<strong>${r.type}</strong><div class=\"small\">${r.text}</div><div style=\"margin-top:8px\"><button class=\"btn\">Mark as done</button> <button class=\"btn ghost\">Save note</button></div>`;
+          recWrap.appendChild(card);
+        });
+      }
+      // also update dashboard counters
+      $('kpiRecs').innerText = recs.length;
+    }
+
+    function renderRecs(){
+      // render last recommendation summary
+      $('recsList').innerHTML = '<div class="small">Run a prediction to generate field-specific recommendations.</div>';
+    }
+
+    // Small helper
+    function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g,c=>({
+      '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;" }[c])); }
+
+    // Boot
+    (function init(){
+      // create a demo account if none
+      if(!localStorage.getItem(LS_USERS)){
+        localStorage.setItem(LS_USERS, JSON.stringify([{email:'demo@farm.test',password:'demo123',name:'Demo Farmer'}]));
+      }
+      // seed some fields
+      if(!localStorage.getItem(LS_FIELDS)){
+        const demo = [{id:'fld_1',name:'North Field',crop:'Maize',area:1.2,last_yield:2800},{id:'fld_2',name:'South Patch',crop:'Wheat',area:0.5,last_yield:2100}];
+        localStorage.setItem(LS_FIELDS, JSON.stringify(demo));
+      }
+      renderApp();
+    })();
   </script>
 </body>
 </html>
