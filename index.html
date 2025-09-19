@@ -6,179 +6,804 @@
   <title>AI Crop Yield — Prototype</title>
   <style>
     :root{
-      --accent:#4f46e5;
-      --accent2:#06b6d4;
-      --muted:#666;
+      --green-1:#0b6b2b;
+      --green-2:#34d399;
+      --muted:#566;
       --card:#fff;
-      --bg:linear-gradient(135deg,#f0f9ff,#e0f2fe,#f5f3ff);
-      font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+      --bg: linear-gradient(180deg,#eefaf0,#e6f7e8 60%);
+      --glass: rgba(255,255,255,0.8);
+      font-family: Inter, 'Segoe UI', Roboto, Arial, sans-serif;
     }
-    html,body{height:100%;margin:0;background:var(--bg);}
-    .container{max-width:1150px;margin:28px auto;padding:20px}
-    header{display:flex;align-items:center;justify-content:space-between}
-    .brand{display:flex;align-items:center;gap:12px}
-    .logo{width:46px;height:46px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;box-shadow:0 3px 10px rgba(0,0,0,0.2)}
-    h1{margin:0;font-size:20px;color:#111}
-    .card{background:var(--card);border-radius:14px;padding:20px;box-shadow:0 8px 20px rgba(20,30,50,0.08);transition:transform 0.2s}
-    .card:hover{transform:translateY(-2px)}
-    .grid{display:grid;grid-template-columns:280px 1fr;gap:18px;margin-top:18px}
-    nav .menu{display:flex;flex-direction:column;gap:10px}
-    .menu button{background:none;border:0;padding:12px 14px;border-radius:10px;text-align:left;cursor:pointer;font-weight:500;transition:all 0.2s}
-    .menu button:hover{background:rgba(79,70,229,0.08)}
-    .menu button.active{background:linear-gradient(90deg,rgba(79,70,229,0.15),rgba(6,182,212,0.12));color:var(--accent)}
-    .login-wrap{max-width:420px;margin:40px auto}
-    .form-row{margin-bottom:14px}
-    label{display:block;margin-bottom:6px;color:var(--muted);font-size:13px}
-    input,select,textarea{width:100%;padding:10px 12px;border-radius:10px;border:1px solid #e3e6ef;background:#fff;font-size:14px}
-    textarea{resize:vertical;min-height:60px}
-    .btn{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;padding:10px 14px;border-radius:10px;border:0;cursor:pointer;transition:opacity 0.2s}
-    .btn:hover{opacity:0.9}
-    .btn.ghost{background:transparent;color:var(--accent);border:1px solid rgba(79,70,229,0.3)}
+    html,body{height:100%;margin:0;background:var(--bg);color:#0a2f1a}
+    .container{max-width:1200px;margin:22px auto;padding:18px}
+    header{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .brand{display:flex;align-items:center;gap:14px}
+    .logo{width:52px;height:52px;border-radius:12px;background:linear-gradient(135deg,var(--green-1),var(--green-2));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;box-shadow:0 6px 18px rgba(6,95,50,0.12);font-size:18px}
+    h1{margin:0;font-size:20px}
     .small{font-size:13px;color:var(--muted)}
+
+    /* layout */
+    .grid{display:grid;grid-template-columns:300px 1fr;gap:18px;margin-top:18px}
+    .card{background:var(--card);border-radius:14px;padding:16px;box-shadow:0 8px 24px rgba(8,20,10,0.04);overflow:hidden}
+    nav .menu{display:flex;flex-direction:column;gap:8px}
+    .menu button{background:none;border:0;padding:10px;border-radius:10px;text-align:left;cursor:pointer;font-weight:600;color:#0a2f1a}
+    .menu button.active{background:linear-gradient(90deg,rgba(11,107,43,0.08),rgba(52,211,153,0.06));color:var(--green-1)}
+    .menu .logout{margin-top:10px}
+
+    /* login */
+    .login-wrap{max-width:480px;margin:28px auto}
+    label{display:block;margin-bottom:6px;color:var(--muted);font-size:13px}
+    input,select,textarea{width:100%;padding:10px;border-radius:10px;border:1px solid #e6eee6;background:#fff;font-size:14px}
+    textarea{min-height:80px}
+    .btn{background:linear-gradient(135deg,var(--green-1),var(--green-2));color:#fff;padding:10px 14px;border-radius:10px;border:0;cursor:pointer}
+    .btn.ghost{background:transparent;color:var(--green-1);border:1px solid rgba(11,107,43,0.12)}
+
+    /* dashboard */
+    .kpi{display:flex;gap:12px}
+    .kpi .item{flex:1;padding:12px;border-radius:12px;background:linear-gradient(180deg,#fff,#f6fff8);box-shadow:0 6px 18px rgba(8,20,10,0.03)}
     table{width:100%;border-collapse:collapse}
-    th,td{padding:8px;border-bottom:1px solid #f0f2f6;text-align:left;font-size:14px}
-    .kpi{display:flex;gap:14px}
-    .kpi .item{flex:1;padding:14px;border-radius:12px;background:linear-gradient(135deg,#fff,#f8fafc);box-shadow:0 4px 12px rgba(20,30,50,0.06)}
-    footer{margin-top:28px;text-align:center;color:var(--muted);font-size:13px}
-    /* Discussion */
-    .post{padding:12px;border-bottom:1px solid #eee}
-    .post strong{color:#111}
-    .reply{margin-left:20px;padding:6px 0;font-size:13px;color:#444}
-    .postForm textarea{margin-bottom:8px}
-    .post img,.reply img{max-width:200px;display:block;margin-top:6px;border-radius:8px}
-    @media(max-width:880px){.grid{grid-template-columns:1fr;}.logo{display:none}}
+    th,td{padding:8px;border-bottom:1px solid #f1f6f1;text-align:left}
+
+    /* search */
+    .searchBar{display:flex;gap:8px;align-items:center}
+    .searchBar input{flex:1}
+
+    /* discussion */
+    .post{padding:12px;border-radius:10px;border:1px solid #eef6ee;margin-bottom:10px;background:#fcfffb}
+    .post img{max-width:360px;border-radius:8px;margin-top:8px}
+    .reply{margin-left:14px;padding:6px 0;font-size:13px;color:#164e2b}
+
+    /* notifications */
+    .notif-badge{background:var(--green-1);color:#fff;padding:6px 8px;border-radius:999px;font-size:12px;margin-left:8px}
+
+    /* images */
+    .hero{height:120px;border-radius:12px;background-image:url('https://images.unsplash.com/photo-1507316702329-0e8a2c4b2d6a?q=80&w=1400&auto=format&fit=crop&ixlib=rb-4.0.3&s=7f4a0033f2d0a2e92b7a7e0f88b1c3a6');background-size:cover;background-position:center;box-shadow:inset 0 -30px 40px rgba(0,0,0,0.06)}
+    .field-thumb{width:64px;height:44px;border-radius:8px;object-fit:cover;border:1px solid #eef7ee}
+
+    /* responsive */
+    @media(max-width:980px){
+      .grid{grid-template-columns:1fr}
+      .logo{display:none}
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <header>
       <div class="brand">
-        <div class="logo">AI</div>
+        <div class="logo">AG</div>
         <div>
-          <h1>AI Crop Yield — Prototype</h1>
-          <div class="small">Prediction • Recommendations • Discussion</div>
+          <h1 id="appTitle">AI Crop Yield — Prototype</h1>
+          <div class="small" id="appSubtitle">Prediction • Recommendations • Community</div>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:12px">
+        <div class="searchBar card" style="width:420px;padding:8px 12px;display:flex;align-items:center">
+          <select id="searchCategory" style="width:140px;border-radius:8px;border:1px solid #e6eee6;height:38px">
+            <option value="weather">Weather</option>
+            <option value="crops">Crops</option>
+            <option value="pests">Pests</option>
+            <option value="recommend">Recommendations</option>
+          </select>
+          <input id="searchInput" placeholder="Search for weather, pests, crop tips..." />
+          <button class="btn" id="searchBtn">Search</button>
+        </div>
+
+        <div class="card" style="display:flex;gap:8px;align-items:center;padding:8px 12px">
+          <label class="small" for="langSelect" style="margin:0">Language</label>
+          <select id="langSelect" style="height:36px;border-radius:8px;border:1px solid #e6eee6">
+            <option value="en">English</option>
+            <option value="hi">हिन्दी</option>
+            <option value="pa">ਪੰਜਾਬੀ</option>
+          </select>
+        </div>
+
+        <div class="card" style="padding:10px 12px;display:flex;align-items:center;gap:8px">
+          <span class="small" id="notifLabel">Notifications</span>
+          <span id="notifBadge" class="notif-badge" style="display:none">0</span>
+          <button class="btn ghost" id="openNotif">View</button>
         </div>
       </div>
     </header>
 
-    <div id="app">
-      <!-- Login -->
-      <div id="authView" class="login-wrap card">
+    <div id="appArea">
+      <!-- Auth view -->
+      <div id="authView" class="login-wrap card" style="margin-top:18px">
         <h2 id="authTitle">Sign in</h2>
-        <div class="form-row"><label>Email / Phone</label><input id="email"></div>
-        <div class="form-row"><label>Password</label><input id="password" type="password"></div>
+        <div class="form-row">
+          <label>Email / Phone</label>
+          <input id="email" placeholder="you@example.com or +91XXXXXXXXXX">
+        </div>
+        <div class="form-row">
+          <label>Password</label>
+          <input id="password" type="password" placeholder="password">
+        </div>
         <div style="display:flex;gap:8px">
           <button class="btn" id="authBtn">Sign in</button>
           <button class="btn ghost" id="toggleAuth">Create account</button>
         </div>
-        <div class="note small">Prototype only. Data stored in browser localStorage.</div>
+        <div class="small" style="margin-top:8px">This demo stores data in your browser (localStorage). Replace with secure backend for production.</div>
       </div>
 
-      <!-- Main -->
-      <div id="mainView" style="display:none">
+      <!-- Main view -->
+      <div id="mainView" style="display:none;margin-top:18px">
         <div class="grid">
           <nav>
             <div class="card">
-              <div class="menu">
-                <button class="active" data-view="dashboard">Dashboard</button>
-                <button data-view="discussion">Discussion</button>
-                <button id="logoutBtn" class="btn ghost">Logout</button>
+              <div style="display:flex;flex-direction:column;gap:12px">
+                <div style="display:flex;gap:10px;align-items:center">
+                  <img id="avatar" src="https://images.unsplash.com/photo-1482192505345-5655af888cc4?q=80&w=400&auto=format&fit=crop&ixlib=rb-4.0.3&s=9e6a1c6f9676e1d4b9c3baf8a3b6c7d4" alt="" style="width:56px;height:56px;border-radius:8px;object-fit:cover">
+                  <div>
+                    <div id="welcomeName" style="font-weight:700"></div>
+                    <div class="small" id="welcomeRole">Farmer</div>
+                  </div>
+                </div>
+
+                <div class="menu" id="sideMenu">
+                  <button class="active" data-view="dashboardView">Dashboard</button>
+                  <button data-view="fieldsView">Fields</button>
+                  <button data-view="predictView">Predict</button>
+                  <button data-view="recommendView">Recommendations</button>
+                  <button data-view="discussionView">Discussion</button>
+                  <button data-view="notifView">Notifications <span id="sideNotif" class="notif-badge" style="display:none">0</span></button>
+                  <button id="logoutBtn" class="logout btn ghost">Logout</button>
+                </div>
+
+                <div class="small" style="margin-top:6px">Tip: this is a frontend prototype. Swap localStorage with API endpoints for real use.</div>
               </div>
             </div>
+
+            <main>
+              <!-- Dashboard -->
+              <section id="dashboardView" class="card view">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start">
+                  <div>
+                    <h3 id="dashTitle">Dashboard</h3>
+                    <div class="small" id="dashSubtitle">Overview — predictions, weather, soil</div>
+                  </div>
+                  <div style="width:260px">
+                    <div class="hero"></div>
+                  </div>
+                </div>
+
+                <div class="kpi" style="margin-top:16px">
+                  <div class="item">
+                    <div class="small" id="lblPredYield">Predicted avg yield</div>
+                    <div style="font-size:22px;font-weight:800;color:var(--green-1)" id="kpiYield">-- kg/ha</div>
+                    <div class="small" id="predNote" style="margin-top:6px">Confidence: --</div>
+                  </div>
+                  <div class="item">
+                    <div class="small" id="lblSoil">Avg soil health (index)</div>
+                    <div style="font-size:22px;font-weight:800" id="kpiSoil">--</div>
+                    <div class="small" id="soilNote" style="margin-top:6px">pH / N / P / K — --</div>
+                  </div>
+                  <div class="item">
+                    <div class="small" id="lblWeather">Local weather</div>
+                    <div style="font-size:22px;font-weight:800" id="kpiWeather">--</div>
+                    <div style="margin-top:6px;display:flex;gap:8px">
+                      <button class="btn" id="refreshWeather">Refresh</button>
+                      <button class="btn ghost" id="mockWeather">Mock Fill</button>
+                    </div>
+                  </div>
+                </div>
+
+                <div style="margin-top:16px">
+                  <h4 id="fieldsHeading">Your fields</h4>
+                  <table id="fieldsTable"><thead><tr><th>Name</th><th>Crop</th><th>Area (ha)</th><th>Last yield (kg/ha)</th><th>Image</th><th>Actions</th></tr></thead><tbody></tbody></table>
+                  <div style="margin-top:10px"><button class="btn" id="addFieldBtn">Add field</button></div>
+                </div>
+              </section>
+
+              <!-- Fields -->
+              <section id="fieldsView" class="card view" style="display:none">
+                <h3 id="fieldsTitle">Fields</h3>
+                <div id="fieldFormWrap"></div>
+                <div style="margin-top:12px"><table id="fieldsTable2"><thead><tr><th>Name</th><th>Crop</th><th>Area</th><th>Last yield</th><th>Image</th><th>Actions</th></tr></thead><tbody></tbody></table></div>
+              </section>
+
+              <!-- Predict -->
+              <section id="predictView" class="card view" style="display:none">
+                <h3 id="predictTitle">Predict Yield</h3>
+                <div style="display:flex;gap:12px;flex-wrap:wrap">
+                  <div style="flex:1;min-width:260px">
+                    <label>Choose field</label>
+                    <select id="selectField"></select>
+                    <label style="margin-top:8px">Crop</label>
+                    <input id="predictCrop" placeholder="e.g., Maize">
+                    <label style="margin-top:8px">Sowing date</label>
+                    <input id="sowingDate" type="date">
+                    <label style="margin-top:8px">Soil index (0-100)</label>
+                    <input id="soilIndex" type="number" min="0" max="100">
+                    <div style="margin-top:10px;display:flex;gap:8px">
+                      <button class="btn" id="runPredict">Run prediction</button>
+                      <button class="btn ghost" id="fillPredict">Fill mock</button>
+                    </div>
+                  </div>
+                  <div style="flex:1;min-width:260px" id="predictOutput" style="display:none">
+                    <h4 id="predictOutTitle">Prediction</h4>
+                    <div class="small">Predicted Yield (kg/ha): <strong id="predYield"></strong></div>
+                    <div class="small">Confidence interval: <span id="predCI"></span></div>
+                    <div style="margin-top:8px"><strong>Top drivers</strong><ul id="topDrivers"></ul></div>
+                  </div>
+                </div>
+              </section>
+
+              <!-- Recs -->
+              <section id="recommendView" class="card view" style="display:none">
+                <h3 id="recsTitle">Recommendations</h3>
+                <div id="recsList">No recommendations yet. Run a prediction to see tailored recs.</div>
+              </section>
+
+              <!-- Discussion -->
+              <section id="discussionView" class="card view" style="display:none">
+                <h3 id="discussionTitle">Community Discussion</h3>
+                <div class="postForm" style="margin-bottom:12px">
+                  <label id="postLabel">Share your problem or tip</label>
+                  <textarea id="postText" placeholder="Describe the problem, attach an image..."></textarea>
+                  <input type="file" id="postImage" accept="image/*" style="margin-top:8px">
+                  <div style="margin-top:8px;display:flex;gap:8px">
+                    <button class="btn" id="addPost">Post</button>
+                    <button class="btn ghost" id="clearPosts">Clear all posts</button>
+                  </div>
+                </div>
+                <div id="postsList"></div>
+              </section>
+
+              <!-- Notifications -->
+              <section id="notifView" class="card view" style="display:none">
+                <h3 id="notifTitle">Notifications</h3>
+                <div id="notifList" class="small">No notifications</div>
+                <div style="margin-top:12px"><button class="btn" id="clearNotifs">Clear</button></div>
+              </section>
+            </main>
           </nav>
-          <main>
-            <section id="dashboard" class="card view">
-              <h3>Dashboard</h3>
-              <div class="kpi" style="margin-top:12px">
-                <div class="item"><div class="small">Predicted avg yield</div><div style="font-size:22px;font-weight:700" id="kpiYield">-- kg/ha</div></div>
-                <div class="item"><div class="small">Soil health</div><div style="font-size:22px;font-weight:700" id="kpiSoil">--</div></div>
-              </div>
-            </section>
-            <section id="discussion" class="card view" style="display:none">
-              <h3>Community Discussion</h3>
-              <div class="postForm">
-                <textarea id="postText" placeholder="Share your problem or tip..."></textarea>
-                <input type="file" id="postImage" accept="image/*">
-                <button class="btn" id="addPost">Post</button>
-              </div>
-              <div id="postsList" style="margin-top:12px"></div>
-            </section>
-          </main>
         </div>
-        <footer>Prototype — Local storage only. Replace with backend + ML API for production.</footer>
       </div>
     </div>
+
+    <footer style="margin-top:18px;text-align:center" class="small">Prototype — demo only. Replace localStorage & mock functions with real backend, ML APIs and weather APIs for production.</footer>
   </div>
 
   <script>
-    const $=id=>document.getElementById(id);
-    const LS_USER='acrop_user',LS_USERS='acrop_users',LS_POSTS='acrop_posts';
-    function getCurrentUser(){return JSON.parse(localStorage.getItem(LS_USER)||'null')}
-    function login(e,p){let u={email:e,password:p,name:e.split('@')[0]};localStorage.setItem(LS_USER,JSON.stringify(u));return u}
-    function logout(){localStorage.removeItem(LS_USER);renderApp()}
-    function getPosts(){return JSON.parse(localStorage.getItem(LS_POSTS)||'[]')}
-    function savePosts(p){localStorage.setItem(LS_POSTS,JSON.stringify(p))}
+    /****************************************************************
+     * Full prototype script
+     * - LocalStorage based auth, fields, posts, notifications
+     * - Mock predict(), soil & weather summary
+     * - Search, language switch (EN/HI/PA)
+     ****************************************************************/
+    // --- Keys
+    const LS_USER='acrop_user',LS_USERS='acrop_users',LS_FIELDS='acrop_fields',LS_POSTS='acrop_posts',LS_NOTIFS='acrop_notifs';
+
+    // --- Simple translations (UI labels)
+    const I18N = {
+      en: {
+        "AI Crop Yield — Prototype":"AI Crop Yield — Prototype",
+        "Prediction • Recommendations • Community":"Prediction • Recommendations • Community",
+        "Search":"Search",
+        "Language":"Language",
+        "Notifications":"Notifications",
+        "Dashboard":"Dashboard",
+        "Fields":"Fields",
+        "Predict":"Predict",
+        "Recommendations":"Recommendations",
+        "Discussion":"Discussion",
+        "Logout":"Logout",
+        "Sign in":"Sign in",
+        "Create account":"Create account",
+        "Share your problem or tip":"Share your problem or tip",
+        "Post":"Post",
+        "Mock Fill":"Mock Fill",
+        "Refresh":"Refresh",
+        "Predicted avg yield":"Predicted avg yield",
+        "Avg soil health (index)":"Avg soil health (index)",
+        "Local weather":"Local weather",
+        "Your fields":"Your fields",
+        "Add field":"Add field",
+      },
+      hi: {
+        "AI Crop Yield — Prototype":"एआई फसल उपज — प्रोटोटाइप",
+        "Prediction • Recommendations • Community":"भविष्यवाणी • सुझाव • समुदाय",
+        "Search":"खोज",
+        "Language":"भाषा",
+        "Notifications":"सूचनाएँ",
+        "Dashboard":"डैशबोर्ड",
+        "Fields":"खेत",
+        "Predict":"भविष्यवाणी",
+        "Recommendations":"सुझाव",
+        "Discussion":"चर्चा",
+        "Logout":"लॉग आउट",
+        "Sign in":"साइन इन",
+        "Create account":"खाता बनाएँ",
+        "Share your problem or tip":"अपनी समस्या या सुझाव साझा करें",
+        "Post":"पोस्ट करें",
+        "Mock Fill":"मॉक भरें",
+        "Refresh":"रिफ्रेश",
+        "Predicted avg yield":"अनुमानित औसत उपज",
+        "Avg soil health (index)":"मिट्टी स्वास्थ्य (सूचकांक)",
+        "Local weather":"स्थानीय मौसम",
+        "Your fields":"आपके खेत",
+        "Add field":"खेत जोड़ें",
+      },
+      pa: {
+        "AI Crop Yield — Prototype":"ਏਆਈ ਫਸਲ ਉਪਜ — ਪ੍ਰੋਟੋਟਾਈਪ",
+        "Prediction • Recommendations • Community":"ਭਵਿੱਖਬਾਣੀ • ਸਿਫਾਰਿਸ਼ਾਂ • ਕਮਿਊਨਿਟੀ",
+        "Search":"ਖੋਜ",
+        "Language":"ਭਾਸ਼ਾ",
+        "Notifications":"ਸੂਚਨਾਵਾਂ",
+        "Dashboard":"ਡੈਸ਼ਬੋਰਡ",
+        "Fields":"ਖੇਤ",
+        "Predict":"ਭਵਿੱਖਬਾਣੀ",
+        "Recommendations":"ਸਿਫਾਰਿਸ਼ਾਂ",
+        "Discussion":"ਚਰਚਾ",
+        "Logout":"ਲੌਗ ਆਊਟ",
+        "Sign in":"ਸਾਈਨ ਇਨ",
+        "Create account":"ਖਾਤਾ ਬਣਾਓ",
+        "Share your problem or tip":"ਆਪਣੀ ਸਮੱਸਿਆ ਜਾਂ ਸੁਝਾਅ ਸਾਂਝਾ ਕਰੋ",
+        "Post":"ਪੋਸਟ",
+        "Mock Fill":"ਮੌਕ ਭਰੋ",
+        "Refresh":"ਰਿਫ੍ਰੈਸ਼",
+        "Predicted avg yield":"ਅਨੁਮਾਨਤ ਔਸਤ ਉਪਜ",
+        "Avg soil health (index)":"ਮਿੱਟੀ ਸਿਹਤ (ਸੂਚਕ)",
+        "Local weather":"ਸਥਾਨਕ ਮੌਸਮ",
+        "Your fields":"ਤੁਹਾਡੇ ਖੇਤ",
+        "Add field":"ਖੇਤ ਸ਼ਾਮਲ ਕਰੋ",
+      }
+    };
+
+    // --- Utility helpers
+    const $ = id => document.getElementById(id);
+    function t(key){ const lang = $('langSelect').value || 'en'; return I18N[lang][key] || key; }
+    function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+
+    // --- Storage helpers
+    function getCurrentUser(){ return JSON.parse(localStorage.getItem(LS_USER) || 'null'); }
+    function saveUserToStorage(user){
+      const list = JSON.parse(localStorage.getItem(LS_USERS)||'[]');
+      const idx = list.findIndex(u=>u.email===user.email);
+      if(idx>=0) list[idx]=user; else list.push(user);
+      localStorage.setItem(LS_USERS, JSON.stringify(list));
+      localStorage.setItem(LS_USER, JSON.stringify(user));
+    }
+    function logout(){ localStorage.removeItem(LS_USER); renderApp(); }
+
+    function getFields(){ return JSON.parse(localStorage.getItem(LS_FIELDS)||'[]'); }
+    function saveFields(f){ localStorage.setItem(LS_FIELDS, JSON.stringify(f)); }
+    function getPosts(){ return JSON.parse(localStorage.getItem(LS_POSTS)||'[]'); }
+    function savePosts(p){ localStorage.setItem(LS_POSTS, JSON.stringify(p)); }
+    function getNotifs(){ return JSON.parse(localStorage.getItem(LS_NOTIFS)||'[]'); }
+    function saveNotifs(n){ localStorage.setItem(LS_NOTIFS, JSON.stringify(n)); }
+
+    // --- Auth UI & handlers
+    function attachAuthHandlers(){
+      $('authBtn').onclick = ()=>{
+        const email = $('email').value.trim(); const pw = $('password').value;
+        if(!email || !pw){ alert('Enter credentials'); return; }
+        // check known users (very simple): allow register if not found
+        const users = JSON.parse(localStorage.getItem(LS_USERS)||'[]');
+        let found = users.find(u=>u.email===email && u.password===pw);
+        if(found){
+          localStorage.setItem(LS_USER, JSON.stringify(found));
+          renderApp();
+          return;
+        }
+        if(confirm('User not found. Create new account with these credentials?')){
+          const newu = {email, password: pw, name: email.split('@')[0]};
+          saveUserToStorage(newu);
+          alert('Account created & signed in');
+          renderApp();
+        }
+      };
+      $('toggleAuth').onclick = ()=>{
+        // helpful hint - we auto-register if not exists above; keep button as hint
+        alert('To create an account: enter email & password and click Sign in — you will be prompted to register if user not found.');
+      };
+    }
+
+    // --- Language switch
+    $('langSelect').onchange = ()=>{ localizeUI(); };
+
+    function localizeUI(){
+      // set some labels dynamically using translation map
+      document.title = t("AI Crop Yield — Prototype");
+      $('appTitle').innerText = t("AI Crop Yield — Prototype");
+      $('appSubtitle').innerText = t("Prediction • Recommendations • Community");
+      $('authTitle').innerText = t("Sign in");
+      $('authBtn').innerText = t("Sign in");
+      $('toggleAuth').innerText = t("Create account");
+      $('dashTitle').innerText = t("Dashboard");
+      $('fieldsTitle').innerText = t("Fields");
+      $('predictTitle').innerText = t("Predict");
+      $('recsTitle').innerText = t("Recommendations");
+      $('discussionTitle').innerText = t("Discussion");
+      $('notifTitle').innerText = t("Notifications");
+      $('lblPredYield').innerText = t("Predicted avg yield");
+      $('lblSoil').innerText = t("Avg soil health (index)");
+      $('lblWeather').innerText = t("Local weather");
+      $('fieldsHeading').innerText = t("Your fields");
+      $('addFieldBtn').innerText = t("Add field");
+      $('postLabel').innerText = t("Share your problem or tip");
+      $('addPost').innerText = t("Post");
+      $('mockWeather').innerText = t("Mock Fill");
+      $('refreshWeather').innerText = t("Refresh");
+      // search button
+      $('searchBtn').innerText = t("Search");
+      // side menu labels
+      document.querySelectorAll('#sideMenu button').forEach(btn=>{
+        const key = btn.dataset.view;
+        if(key==='dashboardView') btn.innerText = t("Dashboard");
+        if(key==='fieldsView') btn.innerText = t("Fields");
+        if(key==='predictView') btn.innerText = t("Predict");
+        if(key==='recommendView') btn.innerText = t("Recommendations");
+        if(key==='discussionView') btn.innerText = t("Discussion");
+      });
+    }
+
+    // --- Notifications
+    function pushNotif(text){
+      const u = getCurrentUser();
+      if(!u) return;
+      const n = getNotifs();
+      n.unshift({id:Date.now(),text, time:new Date().toLocaleString()});
+      saveNotifs(n);
+      renderNotifs();
+    }
+    function renderNotifs(){
+      const n = getNotifs();
+      const badge = $('notifBadge');
+      const side = $('sideNotif');
+      if(n.length){
+        badge.style.display='inline-block'; badge.innerText = n.length;
+        side.style.display='inline-block'; side.innerText = n.length;
+        $('notifList').innerHTML = n.map(x=>`<div style="padding:8px;border-bottom:1px solid #eef7ee"><strong class="small">${x.time}</strong><div>${escapeHtml(x.text)}</div></div>`).join('');
+      } else {
+        badge.style.display='none'; side.style.display='none';
+        $('notifList').innerHTML = '<div class="small">No notifications</div>';
+      }
+    }
+    $('openNotif').onclick = ()=>{ showView('notifView'); };
+
+    $('clearNotifs').onclick = ()=>{ if(confirm('Clear notifications?')){ saveNotifs([]); renderNotifs(); }};
+
+    // --- Fields CRUD + UI
+    function renderFieldsTable(){
+      const f = getFields();
+      const tbody = document.querySelector('#fieldsTable tbody');
+      const tbody2 = document.querySelector('#fieldsTable2 tbody');
+      if(tbody) tbody.innerHTML = '';
+      if(tbody2) tbody2.innerHTML = '';
+      if(!f.length){
+        if(tbody) tbody.innerHTML = '<tr><td colspan="6" class="small">No fields yet</td></tr>';
+        if(tbody2) tbody2.innerHTML = '<tr><td colspan="6" class="small">No fields yet</td></tr>';
+        return;
+      }
+      f.forEach(field=>{
+        const imgHtml = field.img ? `<img class="field-thumb" src="${field.img}" alt="">` : '';
+        const row = `<tr>
+          <td>${escapeHtml(field.name)}</td>
+          <td>${escapeHtml(field.crop)}</td>
+          <td>${field.area||0}</td>
+          <td>${field.last_yield||'--'}</td>
+          <td>${imgHtml}</td>
+          <td><button class="btn ghost" data-edit="${field.id}">Edit</button> <button class="btn" data-del="${field.id}">Delete</button></td>
+        </tr>`;
+        if(tbody) tbody.insertAdjacentHTML('beforeend', row);
+        if(tbody2) tbody2.insertAdjacentHTML('beforeend', row);
+      });
+      // attach actions
+      document.querySelectorAll('button[data-edit]').forEach(b=>b.onclick = ()=>{
+        const id = b.dataset.edit; showEditFieldForm(id);
+      });
+      document.querySelectorAll('button[data-del]').forEach(b=>b.onclick = ()=>{
+        const id = b.dataset.del;
+        if(confirm('Delete field?')){ saveFields(getFields().filter(x=>x.id!==id)); renderFieldsTable(); populateSelectFields(); renderKPIs(); pushNotif('Field deleted'); }
+      });
+    }
+
+    function showAddFieldForm(){
+      const wrap = $('fieldFormWrap');
+      wrap.innerHTML = fieldFormHtml();
+      attachFieldFormHandlers();
+      window.scrollTo({top:wrap.offsetTop - 60, behavior:'smooth'});
+    }
+    function showEditFieldForm(id){
+      const f = getFields().find(x=>x.id===id); if(!f) return;
+      const wrap = $('fieldFormWrap');
+      wrap.innerHTML = fieldFormHtml(f);
+      attachFieldFormHandlers(id);
+      window.scrollTo({top:wrap.offsetTop - 60, behavior:'smooth'});
+    }
+    function fieldFormHtml(field={name:'',crop:'',area:1,last_yield:'',img:''}){
+      return `
+        <div class="card" style="margin-bottom:12px">
+          <h4>${field.id? 'Edit Field':'Add Field'}</h4>
+          <label>Field name</label><input id="f_name" value="${escapeHtml(field.name)}">
+          <label style="margin-top:8px">Crop</label><input id="f_crop" value="${escapeHtml(field.crop)}">
+          <label style="margin-top:8px">Area (ha)</label><input id="f_area" type="number" value="${field.area||1}">
+          <label style="margin-top:8px">Last season yield (kg/ha)</label><input id="f_last" value="${escapeHtml(field.last_yield||'')}">
+          <label style="margin-top:8px">Image (optional)</label><input type="file" id="f_img" accept="image/*">
+          <div style="margin-top:10px;display:flex;gap:8px"><button class="btn" id="saveField">${field.id? 'Save':'Add'}</button><button class="btn ghost" id="cancelField">Cancel</button></div>
+        </div>
+      `;
+    }
+    function attachFieldFormHandlers(editId){
+      $('cancelField').onclick = ()=>{ $('fieldFormWrap').innerHTML=''; };
+      $('saveField').onclick = ()=>{
+        const name = $('f_name').value.trim(); const crop = $('f_crop').value.trim(); const area = parseFloat($('f_area').value)||0; const last = $('f_last').value.trim();
+        if(!name){ alert('Enter field name'); return; }
+        const file = $('f_img').files[0];
+        if(file){
+          const r = new FileReader();
+          r.onload = ()=>{ saveOrUpdateField(editId,{name,crop,area,last,img:r.result}); };
+          r.readAsDataURL(file);
+        } else saveOrUpdateField(editId,{name,crop,area,last});
+      };
+    }
+    function saveOrUpdateField(editId, payload){
+      let f = getFields();
+      if(editId){
+        const idx = f.findIndex(x=>x.id===editId);
+        if(idx>=0){ f[idx] = {...f[idx], name: payload.name, crop: payload.crop, area: payload.area, last_yield: payload.last, img: payload.img || f[idx].img}; }
+      } else {
+        f.push({id: 'fld_'+Date.now(), name: payload.name, crop: payload.crop, area: payload.area, last_yield: payload.last, img: payload.img || ''});
+      }
+      saveFields(f);
+      $('fieldFormWrap').innerHTML='';
+      renderFieldsTable(); populateSelectFields(); renderKPIs();
+      pushNotif(editId ? 'Field updated' : 'Field added');
+    }
+
+    // populate select for predict
+    function populateSelectFields(){
+      const sel = $('selectField');
+      sel.innerHTML = '';
+      const f = getFields();
+      if(!f.length) sel.innerHTML = '<option value="">-- no fields --</option>';
+      f.forEach(ff=>{ const opt = document.createElement('option'); opt.value = ff.id; opt.innerText = ff.name; sel.appendChild(opt); });
+    }
+
+    // --- Mock ML predict
+    function mockPredict({field,soilIndex,cropDays, cropOverride}){
+      // crop base yields
+      const cropBaseMap = {Maize:3000,Wheat:2500,Rice:3500,Soy:1800};
+      const cropName = cropOverride || field.crop || 'Maize';
+      const cropBase = cropBaseMap[cropName] || 2800;
+      const last = Number(field.last_yield) || cropBase*0.6;
+      const soilFactor = (Number(soilIndex)||50)/100; // 0..1
+      const timeFactor = Math.max(0, Math.min(1, (cropDays||90)/120));
+      const pred = Math.round(0.5*last + 0.4*cropBase*soilFactor + 0.1*cropBase*timeFactor);
+      const conf = Math.max(0.05, (field.last_yield?0.12:0.22) * (1 - Math.abs(soilFactor-0.5)));
+      const drivers = [
+        {feature:'last_yield',impact: field.last_yield? 0.5:0.2},
+        {feature:'soil_index',impact: soilFactor},
+        {feature:'crop_base',impact: cropBase/4000}
+      ];
+      return {pred, lower: Math.max(0, Math.round(pred*(1-conf))), upper: Math.round(pred*(1+conf)), conf, drivers, cropName};
+    }
+
+    // run prediction UI handler
+    function runPredictHandler(){
+      const fieldId = $('selectField').value;
+      const field = getFields().find(x=>x.id===fieldId);
+      if(!field){ alert('Choose a field'); return; }
+      const crop = $('predictCrop').value.trim() || field.crop;
+      const sow = $('sowingDate').value ? new Date($('sowingDate').value) : new Date();
+      const days = Math.floor((new Date() - sow)/86400000);
+      const soilIndex = Number($('soilIndex').value) || 50;
+      const res = mockPredict({field, soilIndex, cropDays: days, cropOverride: crop});
+      $('predictOutput').style.display = 'block';
+      $('predYield').innerText = res.pred + ' kg/ha';
+      $('predCI').innerText = `${res.lower} - ${res.upper}`;
+      $('predictions').value = res.pred;
+      $('predYield').parentElement.style.color = 'var(--green-1)';
+      // drivers
+      const ul = $('topDrivers'); ul.innerHTML = '';
+      res.drivers.forEach(d=>{ const li = document.createElement('li'); li.innerText = `${d.feature} (impact ${(d.impact*100).toFixed(0)}%)`; ul.appendChild(li); });
+      // Update dashboard KPI
+      $('kpiYield').innerText = res.pred + ' kg/ha';
+      $('predNote').innerText = `Confidence: ${(1-res.conf).toFixed(2)}`;
+      // Recommendations (simple rules)
+      const recs = [];
+      if(soilIndex < 40) recs.push('Soil low — apply organic compost and test N/P/K.');
+      if(res.pred < (Number(field.last_yield)||0)) recs.push('Predicted less than last season — check irrigation and pests.');
+      if(!recs.length) recs.push('Crop conditions look normal — continue current schedule.');
+      $('recsList').innerHTML = '<ul>' + recs.map(r=>`<li>${r}</li>`).join('') + '</ul>';
+      pushNotif(`Prediction run for ${field.name}: ${res.pred} kg/ha`);
+    }
+    $('runPredict').onclick = runPredictHandler;
+    $('fillPredict').onclick = ()=>{ $('soilIndex').value = 60; $('predictCrop').value='Maize'; $('sowingDate').value = new Date().toISOString().slice(0,10); };
+
+    // --- Weather (mock or manual) ---
+    function renderWeather(mock){
+      if(mock){
+        const w = {temp: 28, rain: 6, cond: 'Partly cloudy'};
+        $('kpiWeather').innerText = `${w.temp}°C · ${w.cond} · ${w.rain}mm rain`;
+      } else {
+        // place for real API call (OpenWeather etc.) — but here we mock
+        renderWeather(true);
+      }
+    }
+    $('mockWeather').onclick = ()=>{ renderWeather(true); pushNotif('Weather updated (mock)'); };
+    $('refreshWeather').onclick = ()=>{ renderWeather(false); pushNotif('Weather refreshed'); };
+
+    // --- Discussion (posts + images + replies)
     function addPost(){
-      let txt=$('postText').value.trim();if(!txt)return;
-      let file=$('postImage').files[0];if(file){
-        let r=new FileReader();
-        r.onload=()=>{saveNewPost(txt,r.result);};
+      const txt = $('postText').value.trim();
+      const file = $('postImage').files[0];
+      if(!txt && !file){ alert('Write something or attach an image'); return; }
+      const posts = getPosts();
+      const user = getCurrentUser();
+      const onSave = (imgData)=>{
+        posts.unshift({id:Date.now(),author:user.name,text:txt,img:imgData,time:new Date().toLocaleString(),replies:[]});
+        savePosts(posts); $('postText').value=''; $('postImage').value=''; renderPosts(); pushNotif('New post created');
+      };
+      if(file){
+        const r = new FileReader();
+        r.onload = ()=> onSave(r.result);
         r.readAsDataURL(file);
-      } else saveNewPost(txt,null);
+      } else onSave(null);
     }
-    function saveNewPost(txt,img){
-      let posts=getPosts();
-      posts.unshift({id:Date.now(),author:getCurrentUser().name,text:txt,img:img,time:new Date().toLocaleString(),replies:[]});
-      savePosts(posts);$('postText').value='';$('postImage').value='';renderPosts();
-    }
+    $('addPost').onclick = addPost;
+    $('clearPosts').onclick = ()=>{ if(confirm('Clear all posts?')){ savePosts([]); renderPosts(); } };
+
     function renderPosts(){
-      let list=$('postsList'),posts=getPosts();
-      if(!posts.length){list.innerHTML='<p class="small">No posts yet</p>';return}
-      list.innerHTML='';
+      const list = $('postsList');
+      const posts = getPosts();
+      if(!posts.length){ list.innerHTML = '<div class="small">No posts yet</div>'; return; }
+      list.innerHTML = '';
       posts.forEach(p=>{
-        let div=document.createElement('div');div.className='post';
-        div.innerHTML=`<strong>${p.author}</strong> <span class="small">${p.time}</span><br>${p.text}`;
-        if(p.img)div.innerHTML+=`<img src="${p.img}">`;
-        div.innerHTML+=`<div class="small" style="margin-top:4px"><input placeholder="Reply..." data-id="${p.id}"><input type="file" data-img="${p.id}" accept="image/*"><button class="btn ghost" data-reply="${p.id}">Reply</button></div>`;
-        p.replies.forEach(r=>{div.innerHTML+=`<div class="reply"><strong>${r.author}</strong>: ${r.text}${r.img?`<img src="${r.img}">`:''}</div>`});
+        const div = document.createElement('div'); div.className='post';
+        div.innerHTML = `<div style="display:flex;justify-content:space-between"><div><strong>${escapeHtml(p.author)}</strong> <span class="small"> · ${escapeHtml(p.time)}</span></div></div>
+          <div style="margin-top:6px">${escapeHtml(p.text)}</div>
+          ${p.img? `<img src="${p.img}" alt="post image">` : '' }
+          <div style="margin-top:8px" class="small">
+            <input placeholder="Reply..." data-id="${p.id}" style="width:60%">
+            <input type="file" data-img="${p.id}" accept="image/*">
+            <button class="btn ghost" data-reply="${p.id}">Reply</button>
+          </div>
+        `;
+        // replies
+        if(p.replies && p.replies.length){
+          p.replies.forEach(rp=>{
+            const rpDiv = document.createElement('div'); rpDiv.className='reply';
+            rpDiv.innerHTML = `<strong>${escapeHtml(rp.author)}</strong>: ${escapeHtml(rp.text)}${rp.img? `<div><img src="${rp.img}"></div>` : ''}`;
+            div.appendChild(rpDiv);
+          });
+        }
         list.appendChild(div);
       });
+      // attach reply handlers
       list.querySelectorAll('button[data-reply]').forEach(b=>{
-        b.onclick=()=>{
-          let id=b.dataset.reply;
-          let inp=list.querySelector(`input[data-id="${id}"]`);
-          let f=list.querySelector(`input[data-img="${id}"]`).files[0];
-          let txt=inp.value.trim();
-          if(!txt && !f)return;
+        b.onclick = ()=>{
+          const id = b.dataset.reply;
+          const parent = b.parentElement;
+          const input = parent.querySelector(`input[data-id="${id}"]`);
+          const fileInput = parent.querySelector(`input[data-img="${id}"]`);
+          const txt = input.value.trim();
+          const f = fileInput.files[0];
+          if(!txt && !f) return alert('Enter reply text or attach image');
           if(f){
-            let r=new FileReader();
-            r.onload=()=>saveReply(id,txt,r.result);
+            const r = new FileReader();
+            r.onload = ()=> saveReply(id, txt, r.result);
             r.readAsDataURL(f);
-          } else saveReply(id,txt,null);
+          } else saveReply(id, txt, null);
         };
       });
     }
-    function saveReply(id,txt,img){
-      let posts=getPosts();
-      let post=posts.find(x=>x.id==id);
-      post.replies.push({author:getCurrentUser().name,text:txt,img:img});
-      savePosts(posts);renderPosts();
+    function saveReply(postId, text, imgData){
+      const posts = getPosts();
+      const p = posts.find(x=>x.id==postId);
+      if(!p) return;
+      p.replies.push({author:getCurrentUser().name, text, img: imgData});
+      savePosts(posts); renderPosts(); pushNotif('New reply posted');
     }
+
+    // --- Search (simple)
+    $('searchBtn').onclick = ()=>{
+      const q = $('searchInput').value.trim().toLowerCase();
+      const cat = $('searchCategory').value;
+      if(!q) return alert('Enter a search query');
+      // very simple simulated results just for prototype
+      let result = '';
+      if(cat==='weather') result = `Weather for '${q}': 27°C, partly cloudy (mock)`;
+      if(cat==='crops') result = `Crops for '${q}': recommended variety - 'Local Hybrid' (mock)`;
+      if(cat==='pests') result = `Pest check for '${q}': aphids possible, inspect leaves (mock)`;
+      if(cat==='recommend') result = `Recommendations for '${q}': increase irrigation frequency by 10% (mock)`;
+      alert(result);
+    };
+
+    // --- Simple UI view handler
+    function showView(id){
+      document.querySelectorAll('.view').forEach(v=>v.style.display='none');
+      $(id).style.display = 'block';
+      // update active button
+      document.querySelectorAll('#sideMenu button').forEach(b=>b.classList.toggle('active', b.dataset.view===id));
+    }
+
+    // side menu wiring
+    document.querySelectorAll('#sideMenu button').forEach(btn=>{
+      btn.onclick = (ev)=>{ showView(btn.dataset.view); };
+    });
+
+    // Logout
+    $('logoutBtn').onclick = ()=>{ if(confirm('Logout?')) logout(); };
+
+    // search category helper: translate options on language change (optional)
+    // Render KPIs and initial data
+    function renderKPIs(){
+      const fields = getFields();
+      if(!fields.length){ $('kpiYield').innerText='-- kg/ha'; $('kpiSoil').innerText='--'; $('kpiWeather').innerText='--'; return; }
+      // avg last yield
+      let sum = 0, cnt=0;
+      fields.forEach(f=>{ if(f.last_yield) { sum += Number(f.last_yield); cnt++; } });
+      const avg = cnt ? Math.round(sum/cnt) : '--';
+      $('kpiYield').innerText = avg==='--' ? '-- kg/ha' : `${avg} kg/ha`;
+      // soil health (mock)
+      const soilIdx = 55; $('kpiSoil').innerText = soilIdx;
+      renderWeather(true);
+      renderFieldsTable();
+      populateSelectFields();
+    }
+
+    // populate select fields
+    function populateSelectFields(){ const sel = $('selectField'); sel.innerHTML=''; const f = getFields(); if(!f.length) sel.innerHTML='<option value="">-- no fields --</option>'; f.forEach(ff=>{ const o = document.createElement('option'); o.value = ff.id; o.innerText = ff.name; sel.appendChild(o); }); }
+
+    // --- render notifications & posts on load
+    function initDemoData(){
+      // if no fields exist, seed a demo field & post
+      if(!localStorage.getItem(LS_FIELDS)){
+        saveFields([
+          {id:'fld_demo1', name:'Kharif Field', crop:'Maize', area:2.5, last_yield:3200, img:'https://images.unsplash.com/photo-1501004318641-b39e6451bec6?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=5f3b8a6d7c3d6a5b5d6f6f1b32b9aabc'},
+          {id:'fld_demo2', name:'Winter Plot', crop:'Wheat', area:1.2, last_yield:2500, img:''}
+        ]);
+      }
+      if(!localStorage.getItem(LS_POSTS)){
+        savePosts([
+          {id: Date.now()-20000, author:'Ravi', text:'Leaf spots appearing on lower leaves. Any suggestions?', img:'', time: new Date(Date.now()-20000).toLocaleString(), replies:[]},
+          {id: Date.now()-10000, author:'Sukhpreet', text:'Tried drip irrigation — reduced water usage by 30%', img:'https://images.unsplash.com/photo-1501004318641-b39e6451bec6?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=5f3b8a6d7c3d6a5b5d6f6f1b32b9aabc', time: new Date(Date.now()-10000).toLocaleString(), replies:[]}
+        ]);
+      }
+      if(!localStorage.getItem(LS_NOTIFS)){
+        saveNotifs([{id:Date.now()-5000, text:'Welcome to the prototype — try posting a question!', time:new Date(Date.now()-5000).toLocaleString()}]);
+      }
+    }
+
+    // --- Main render
     function renderApp(){
-      const u=getCurrentUser();
-      if(!u){$('authView').style.display='block';$('mainView').style.display='none';$('authBtn').onclick=()=>{login($('email').value,$('password').value);renderApp()};return}
-      $('authView').style.display='none';$('mainView').style.display='block';
-      document.querySelectorAll('.menu button').forEach(b=>b.onclick=ev=>{
-        document.querySelectorAll('.menu button').forEach(x=>x.classList.remove('active'));
-        ev.currentTarget.classList.add('active');
-        document.querySelectorAll('.view').forEach(v=>v.style.display='none');
-        $(ev.currentTarget.dataset.view).style.display='block';
-      });
-      $('logoutBtn').onclick=()=>logout();
-      $('addPost').onclick=addPost;
+      const user = getCurrentUser();
+      localizeUI();
+      if(!user){
+        $('authView').style.display='block'; $('mainView').style.display='none';
+        attachAuthHandlers();
+        renderNotifs();
+        return;
+      }
+      $('authView').style.display='none'; $('mainView').style.display='block';
+      $('welcomeName').innerText = user.name || user.email;
+      renderKPIs();
       renderPosts();
+      renderNotifs();
+      // attach field add
+      $('addFieldBtn').onclick = showAddFieldForm;
+      // wire other UI
+      $('addPost').onclick = addPost;
+      $('clearPosts').onclick = ()=>{ if(confirm('Clear all posts?')){ savePosts([]); renderPosts(); } };
+      renderFieldsTable();
+      populateSelectFields();
     }
+
+    // initial demo setup
+    initDemoData();
     renderApp();
+
+    // --- wire other buttons
+    $('mockWeather').onclick = ()=>{ renderWeather(true); pushNotif('Mock weather updated'); };
+    $('refreshWeather').onclick = ()=>{ renderWeather(true); pushNotif('Weather refreshed'); };
+
+    // final: expose some functions to console for debugging
+    window._acrop = {
+      getFields, saveFields, getPosts, savePosts, getNotifs, saveNotifs, pushNotif
+    };
   </script>
 </body>
 </html>
